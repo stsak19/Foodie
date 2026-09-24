@@ -243,6 +243,47 @@
   .opt b{display:block;font-size:15px;font-weight:600;margin-bottom:2px}
   .opt span{font-size:12.5px;color:var(--muted);line-height:1.4}
   .opt .n{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);margin-top:6px;display:block}
+  .opt{position:relative}
+  .opt.own b{padding-right:34px}
+  .opt .mine{
+    display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:9px;font-weight:600;
+    letter-spacing:.09em;text-transform:uppercase;background:var(--ochreSoft);color:var(--ochre);
+    padding:2px 6px;border-radius:4px;margin-left:7px;vertical-align:2px;line-height:1.5;
+  }
+  .opt .del{
+    position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:8px;
+    background:var(--card2);border:1px solid var(--line);color:var(--muted);
+    display:grid;place-items:center;cursor:pointer;padding:0;
+  }
+  .opt .del svg{width:13px;height:13px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round}
+  .addbtn{
+    width:100%;background:transparent;border:1.5px dashed var(--line);border-radius:12px;
+    padding:13px;margin-top:4px;cursor:pointer;font-family:"Commissioner",sans-serif;
+    font-size:14.5px;font-weight:600;color:var(--muted);
+  }
+  .addbtn:active{transform:scale(.99)}
+  .frow{margin-bottom:10px}
+  .frow label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px}
+  .frow input{
+    width:100%;background:var(--card);color:var(--ink);border:1px solid var(--line);
+    border-radius:11px;padding:11px 13px;font-family:"Commissioner",sans-serif;font-size:15px;
+  }
+  .frow input:focus{outline:2px solid var(--dark);outline-offset:1px}
+  .fgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  .fgrid input{
+    text-align:center;font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;
+    padding:11px 4px;-moz-appearance:textfield;appearance:textfield;
+  }
+  .fgrid input::-webkit-outer-spin-button,.fgrid input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .fhint{font-size:12px;color:var(--muted);margin:2px 0 14px}
+  .fbtns{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:4px}
+  .fbtns button{
+    border:0;border-radius:12px;padding:13px;cursor:pointer;
+    font-family:"Commissioner",sans-serif;font-size:15px;font-weight:600;
+  }
+  .bsave{background:var(--dark);color:#fff}
+  .bcancel{background:var(--card2);color:var(--ink)}
+  .fbtns button:active{transform:scale(.98)}
 
   /* tabs */
   nav{
@@ -306,10 +347,6 @@
   .hide{display:none!important}
   .foot{font-size:11.5px;color:var(--muted);margin:22px 0 0;line-height:1.5}
   .ok{font-size:12.5px;color:var(--good);font-weight:600;margin-top:6px;min-height:16px}
-</style>
-<style>
-  :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-  body{margin:0} img{max-width:100%} [hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -441,10 +478,29 @@
   <h2 id="sheetTitle" style="margin:0 0 4px">Παραλλαγές</h2>
   <p style="font-size:13px;color:var(--muted);margin:0 0 14px" id="sheetSub"></p>
   <div id="sheetOpts"></div>
+  <button class="addbtn" id="sheetAdd">+ Δικό μου φαγητό</button>
+
+  <div id="sheetForm" class="hide">
+    <div class="frow"><label for="fName">Όνομα</label><input id="fName" type="text" placeholder="π.χ. Ομελέτα με τυρί"></div>
+    <div class="frow"><label for="fDesc">Τι έχει μέσα</label><input id="fDesc" type="text" placeholder="3 αυγά, 40γρ τυρί, 2 φέτες ψωμί"></div>
+    <div class="frow">
+      <label>Θερμίδες και μακροθρεπτικά</label>
+      <div class="fgrid">
+        <input id="fK" type="number" min="0" inputmode="numeric" placeholder="kcal">
+        <input id="fP" type="number" min="0" inputmode="numeric" placeholder="Π">
+        <input id="fL" type="number" min="0" inputmode="numeric" placeholder="Λ">
+        <input id="fC" type="number" min="0" inputmode="numeric" placeholder="Υ">
+      </div>
+    </div>
+    <div class="fhint">Αν αφήσεις τις θερμίδες κενές, υπολογίζονται μόνες τους από τα μακροθρεπτικά.</div>
+    <div class="fbtns">
+      <button class="bcancel" id="fCancel">Άκυρο</button>
+      <button class="bsave" id="fSave">Αποθήκευση</button>
+    </div>
+  </div>
 </div>
 
 <script>
-
 (function(){
 "use strict";
 
@@ -543,6 +599,7 @@ var SLOTS=["b","s","m","d"];
 
 /* ---------- state ---------- */
 var db=null, today=iso(new Date()), state={meals:{},swaps:{}}, hist=[], view="today", openDay=-1, sheetSlot=null, bought={}, price={}, enterSlot=null;
+var custom={b:[],s:[],m:[],d:[]};
 
 function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function dow(d){return (d.getDay()+6)%7;}           /* Δευτέρα = 0 */
@@ -553,7 +610,14 @@ function optsFor(di,slot){
   var list=VARS[slot].slice();
   var base=slot==="m"?MAIN[di]:slot==="d"?DIN[di]:null;
   if(base){ var has=false; for(var i=0;i<list.length;i++){if(list[i].n===base.n){has=true;break;}} if(!has)list.unshift(base); }
+  var mine=custom[slot]||[];
+  for(var j=0;j<mine.length;j++)list.push(mine[j]);
   return list;
+}
+function isMine(slot,name){
+  var mine=custom[slot]||[];
+  for(var i=0;i<mine.length;i++){ if(mine[i].n===name)return true; }
+  return false;
 }
 function defName(di,slot){ return slot==="b"?B.n:slot==="s"?S.n:(slot==="m"?MAIN[di].n:DIN[di].n); }
 function pickMeal(slot,name){
@@ -571,7 +635,7 @@ function cycleMeal(slot,dir){
 
 function mealFor(di,slot){
   var sw=state.swaps&&state.swaps[slot];
-  if(sw){var list=VARS[slot];for(var i=0;i<list.length;i++){if(list[i].n===sw)return list[i];}}
+  if(sw){var list=optsFor(di,slot);for(var i=0;i<list.length;i++){if(list[i].n===sw)return list[i];}}
   if(slot==="b")return B; if(slot==="s")return S;
   return slot==="m"?MAIN[di]:DIN[di];
 }
@@ -879,24 +943,76 @@ $("weekList").addEventListener("click",function(e){
   var i=+d.dataset.day; openDay=(openDay===i?-1:i); renderWeek();
 });
 
+function renderSheetOpts(){
+  var slot=sheetSlot, di=dow(new Date()), cur=mealFor(di,slot), list=optsFor(di,slot);
+  $("sheetOpts").innerHTML=list.map(function(m){
+    var mine=isMine(slot,m.n);
+    return '<button class="opt'+(m.n===cur.n?" sel":"")+(mine?" own":"")+'" data-n="'+esc(m.n)+'">'+
+      '<b>'+esc(m.n)+(mine?' <span class="mine">δικό σου</span>':'')+'</b>'+
+      '<span>'+esc(m.f)+'</span>'+
+      '<span class="n">'+m.k+' kcal · Π '+m.p+' · Λ '+m.l+' · Υ '+m.c+'</span>'+
+      (mine?'<span class="del" data-del="'+esc(m.n)+'" role="button" aria-label="Διαγραφή">'+
+        '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span>':'')+
+      '</button>';
+  }).join("");
+}
+function showSheetList(){
+  $("sheetOpts").classList.remove("hide");
+  $("sheetAdd").classList.remove("hide");
+  $("sheetForm").classList.add("hide");
+  $("sheetSub").textContent="Διάλεξε τι θα φας σήμερα. Τα σύνολα ενημερώνονται.";
+}
 function openSheet(slot){
   sheetSlot=slot;
-  var di=dow(new Date()), cur=mealFor(di,slot), list=optsFor(di,slot);
   $("sheetTitle").textContent=SLOTN[slot];
-  $("sheetSub").textContent="Διάλεξε τι θα φας σήμερα. Τα σύνολα ενημερώνονται.";
-  $("sheetOpts").innerHTML=list.map(function(m){
-    return '<button class="opt'+(m.n===cur.n?" sel":"")+'" data-n="'+esc(m.n)+'">'+
-      '<b>'+esc(m.n)+'</b><span>'+esc(m.f)+'</span>'+
-      '<span class="n">'+m.k+' kcal · Π '+m.p+' · Λ '+m.l+' · Υ '+m.c+'</span></button>';
-  }).join("");
+  renderSheetOpts();
+  showSheetList();
   $("scrim").classList.add("on"); $("sheet").classList.add("on");
 }
 function closeSheet(){ $("scrim").classList.remove("on"); $("sheet").classList.remove("on"); }
 $("scrim").addEventListener("click",closeSheet);
 $("sheetOpts").addEventListener("click",function(e){
+  var x=e.target.closest("[data-del]");
+  if(x){ e.stopPropagation(); delMine(sheetSlot,x.dataset.del); return; }
   var o=e.target.closest("[data-n]"); if(!o)return;
   pickMeal(sheetSlot,o.dataset.n);
   closeSheet(); renderToday(); saveDay();
+});
+
+/* ---------- δικά του φαγητά ---------- */
+function saveCustom(){ return store.set("custom",custom); }
+function delMine(slot,name){
+  var mine=custom[slot]||[];
+  for(var i=0;i<mine.length;i++){ if(mine[i].n===name){ mine.splice(i,1); break; } }
+  if(state.swaps[slot]===name)delete state.swaps[slot];
+  saveCustom(); saveDay();
+  renderSheetOpts(); renderToday(); renderWeek();
+}
+$("sheetAdd").addEventListener("click",function(){
+  ["fName","fDesc","fK","fP","fL","fC"].forEach(function(id){ $(id).value=""; });
+  $("sheetOpts").classList.add("hide");
+  $("sheetAdd").classList.add("hide");
+  $("sheetForm").classList.remove("hide");
+  $("sheetSub").textContent="Γράψε το φαγητό σου. Θα μπαίνει στις παραλλαγές του "+SLOTN[sheetSlot].toLowerCase()+".";
+  $("fName").focus();
+});
+$("fCancel").addEventListener("click",showSheetList);
+$("fSave").addEventListener("click",function(){
+  var slot=sheetSlot;
+  var n=$("fName").value.trim();
+  if(!n){ flash("Βάλε ένα όνομα στο φαγητό."); $("fName").focus(); return; }
+  var di=dow(new Date()), list=optsFor(di,slot);
+  for(var i=0;i<list.length;i++){ if(list[i].n===n){ flash("Υπάρχει ήδη φαγητό με αυτό το όνομα."); return; } }
+  function num(id){ var v=parseFloat($(id).value); return isNaN(v)||v<0?0:Math.round(v); }
+  var p=num("fP"), l=num("fL"), c=num("fC"), k=num("fK");
+  if(!k)k=Math.round(p*4+l*9+c*4);
+  if(!k&&!p&&!l&&!c){ flash("Βάλε θερμίδες ή μακροθρεπτικά."); $("fK").focus(); return; }
+  var f=$("fDesc").value.trim()||"Δικό σου φαγητό";
+  custom[slot].push({n:n,f:f,k:k,p:p,l:l,c:c});
+  pickMeal(slot,n);
+  saveCustom(); saveDay();
+  closeSheet(); renderToday(); renderWeek();
+  flash("Μπήκε στο "+SLOTN[slot].toLowerCase()+".");
 });
 
 $("wSave").addEventListener("click",function(){
@@ -929,6 +1045,9 @@ function hydrate(){
     }
   });
   store.get("shop").then(function(d){ if(d){ bought=d.bought||{}; price=d.price||{}; renderShop(); } });
+  store.get("custom").then(function(d){
+    if(d){ SLOTS.forEach(function(k){ if(Array.isArray(d[k]))custom[k]=d[k]; }); renderToday(); renderWeek(); }
+  });
   store.days().then(function(rows){
     hist=rows.filter(function(r){return r&&r.date;}).sort(function(a,b){return a.date<b.date?-1:1;});
     renderProg();
@@ -948,7 +1067,6 @@ if(window.claude&&claude.use){
   hydrate();
 }
 })();
-
 </script>
 </body>
 </html>
