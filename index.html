@@ -734,7 +734,7 @@ var calY=new Date().getFullYear(), calM=new Date().getMonth();
 /* ok: όλα τα γεύματα τσεκαρισμένα και (αν έχει ρολόι) έλλειμμα · over: πλεόνασμα · part: κάτι γράφτηκε αλλά όχι όλα */
 function dayStatus(r){
   if(!hasData(r))return "none";
-  var nm=0; if(r.meals){ for(var k in r.meals){ if(r.meals[k])nm++; } }
+  var nm=eatenOf(dow(new Date(r.date+"T12:00:00")),r.meals,r.swaps).n;
   if(nm<4)return "part";
   if(typeof r.burnA==="number"){
     var rr=restOf(r.burnR);
@@ -841,7 +841,7 @@ function renderToday(){
   var eaten={k:0,p:0,l:0,c:0}, goal=dayTotal(di,true);
   var html="";
   SLOTS.forEach(function(slot,i){
-    var m=mealFor(di,slot), done=!!state.meals[slot];
+    var m=mealFor(di,slot), done=doneFor(state.meals,slot,m.n);
     if(done){eaten.k+=m.k;eaten.p+=m.p;eaten.l+=m.l;eaten.c+=m.c;}
     if(slot==="m"){
       var t=TRAIN[di];
@@ -903,9 +903,11 @@ function burnField(id,label,val,ph){
     'placeholder="'+ph+'" value="'+(typeof val==="number"?val:"")+'"><span>kcal</span></div></div>';
 }
 function fmt(n){ return Math.round(n).toLocaleString("el-GR"); }
+/* το τικ κρατάει το όνομα του φαγητού: αν αλλάξεις φαγητό, το καινούριο δεν είναι τσεκαρισμένο */
+function doneFor(meals,slot,name){ var v=meals&&meals[slot]; return v===true||v===name; }
 function eatenOf(di,meals,swaps){
   var k=0,n=0;
-  SLOTS.forEach(function(s){ if(meals&&meals[s]){ k+=mealForSw(di,s,swaps).k; n++; } });
+  SLOTS.forEach(function(s){ var m=mealForSw(di,s,swaps); if(doneFor(meals,s,m.n)){ k+=m.k; n++; } });
   return {k:k,n:n};
 }
 function restOf(r){ return typeof r==="number"?r:(typeof lastRest==="number"?lastRest:null); }
@@ -1122,7 +1124,8 @@ $("todayList").addEventListener("click",function(e){
   if(sw){ openSheet(sw.dataset.swap); return; }
   var card=e.target.closest(".meal"); if(!card)return;
   var slot=card.dataset.slot;
-  state.meals[slot]=!state.meals[slot];
+  var nm=mealFor(vdi(),slot).n;
+  if(doneFor(state.meals,slot,nm))delete state.meals[slot]; else state.meals[slot]=nm;
   upsertHist({meals:state.meals,swaps:state.swaps});
   renderToday(); saveDay();
 });
@@ -1319,6 +1322,8 @@ function loadDay(date){
     if(vday!==date)return;          /* άλλαξε μέρα όσο φόρτωνε */
     if(d){
       state.meals=d.meals||{}; state.swaps=d.swaps||{};
+      /* παλιά τικ (true) → όνομα του φαγητού που ήταν επιλεγμένο */
+      SLOTS.forEach(function(sl){ if(state.meals[sl]===true)state.meals[sl]=mealFor(vdi(),sl).n; });
       if(typeof d.weight==="number"){state.weight=d.weight;$("wIn").value=d.weight;}
       if(typeof d.waist==="number"){state.waist=d.waist;$("cIn").value=d.waist;}
       if(typeof d.burnA==="number")state.burnA=d.burnA;
