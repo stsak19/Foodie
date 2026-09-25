@@ -87,6 +87,73 @@
   h2{font-family:"Alegreya",Georgia,serif;font-weight:700;font-size:20px;margin:22px 0 10px;letter-spacing:-.01em}
   .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:20px 0 7px}
 
+  /* εναλλαγή ημέρας */
+  .dayseg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:14px}
+  .dayseg button{
+    position:relative;border:1px solid var(--line);background:var(--card);border-radius:11px;
+    padding:7px 0 9px;cursor:pointer;color:var(--ink);font-family:"Commissioner",sans-serif;
+    display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0;
+  }
+  .dayseg button:active{transform:scale(.96)}
+  .dayseg .dn{font-size:10.5px;font-weight:600;color:var(--muted);letter-spacing:.02em}
+  .dayseg .dd{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;line-height:1.2}
+  .dayseg .dt{position:absolute;bottom:4px;width:4px;height:4px;border-radius:50%;background:transparent}
+  .dayseg button.has .dt{background:var(--good)}
+  .dayseg button.today{border-color:var(--ink);border-width:1.5px}
+  .dayseg button.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+  .dayseg button.on .dn{color:var(--bg);opacity:.7}
+  .dayseg button.on.has .dt{background:var(--bg)}
+  .ynote{font-size:12.5px;color:var(--ochre);margin:8px 2px 0}
+
+  /* πρωινό ζύγισμα */
+  .wcard{
+    background:var(--card);border:1px solid var(--line);border-radius:13px;
+    padding:11px 13px 3px;margin-top:10px;box-shadow:var(--shadow);
+  }
+  .wcard .lab{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .wcard .field{margin-bottom:8px}
+  .wcard .field label{width:62px}
+  .wcard .field input{font-size:16px;padding:9px 12px}
+  .wcard .field button{padding:0 14px;font-size:13.5px}
+  .wcard .ok{margin:0 0 8px;min-height:0}
+  .wcard .ok:empty{display:none}
+
+  #todayList{margin-top:12px}
+  /* ημερολόγιο μήνα */
+  .calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .calhead b{font-family:"Alegreya",Georgia,serif;font-size:17px;font-weight:700}
+  .calhead button{
+    width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--card);
+    color:var(--ink);cursor:pointer;display:grid;place-items:center;padding:0;
+  }
+  .calhead button:disabled{opacity:.3;cursor:default}
+  .calhead svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .calgrid .wd{text-align:center;font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:600;color:var(--muted);padding-bottom:2px}
+  .cd{
+    aspect-ratio:1;border-radius:8px;border:0;background:transparent;padding:0;cursor:pointer;
+    font-family:"IBM Plex Mono",monospace;font-size:12.5px;font-weight:600;color:var(--muted);
+    display:grid;place-items:center;
+  }
+  .cd.none{background:var(--card2)}
+  .cd.s-ok{background:var(--good);color:var(--bg)}
+  .cd.s-over{background:var(--ochre);color:var(--bg)}
+  .cd.s-part{background:transparent;border:1.5px dashed var(--muted);color:var(--ink)}
+  .cd.fut{background:transparent;opacity:.35;cursor:default}
+  .cd.tod{outline:2px solid var(--ink);outline-offset:1px}
+  .cd:not(.fut):active{transform:scale(.92)}
+  .calleg{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:11px;font-size:11.5px;color:var(--muted)}
+  .calleg span{display:inline-flex;align-items:center;gap:5px}
+  .calleg i{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .calleg .l-ok{background:var(--good)}
+  .calleg .l-over{background:var(--ochre)}
+  .calleg .l-part{border:1.5px dashed var(--muted)}
+  .calleg .l-none{background:var(--card2)}
+  .calsum{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:11px}
+  .calsum div{background:var(--card2);border-radius:9px;padding:7px 9px}
+  .calsum b{display:block;font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600}
+  .calsum span{font-size:11px;color:var(--muted)}
+
   /* progress summary */
   .sum{
     background:var(--dark); color:#fff; border-radius:14px;
@@ -156,14 +223,49 @@
 
   /* training strip */
   .train{
-    display:flex;align-items:center;gap:10px;
     background:var(--ochreSoft);border-left:3px solid var(--ochre);
-    border-radius:0 11px 11px 0;padding:11px 13px;margin:12px 0 9px;
+    border-radius:0 11px 11px 0;padding:11px 13px 12px;margin:12px 0 9px;
   }
-  .train b{font-size:13.5px;color:var(--ochre)}
-  .train span{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ochre);opacity:.85}
+  .trow{display:flex;align-items:center;gap:10px}
+  .trow b{font-size:13.5px;color:var(--ochre)}
+  .trow span{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ochre);opacity:.85}
   .train.rest{background:var(--card2);border-left-color:var(--muted)}
-  .train.rest b,.train.rest span{color:var(--muted)}
+  .train.rest .trow b,.train.rest .trow span{color:var(--muted)}
+  .burn{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .burn>div{min-width:0}
+  .burn label{display:block;font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:3px}
+  .bin{
+    display:flex;align-items:center;gap:4px;background:var(--card);
+    border:1px solid var(--line);border-radius:9px;padding:6px 10px;
+  }
+  .bin:focus-within{outline:2px solid var(--dark);outline-offset:1px}
+  .bin input{
+    flex:1;min-width:0;width:100%;border:0;background:transparent;color:var(--ink);padding:0;
+    font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:600;
+    -moz-appearance:textfield;appearance:textfield;
+  }
+  .bin input:focus{outline:none}
+  .bin input::-webkit-outer-spin-button,.bin input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .bin input::placeholder{color:var(--muted);opacity:.55;font-weight:500}
+  .bin span{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+  .bhint{font-size:11.5px;color:var(--muted);margin-top:7px;line-height:1.4}
+
+  /* ισοζύγιο */
+  .bal{
+    background:var(--card);border:1px solid var(--line);border-radius:13px;
+    padding:13px 15px;margin-top:16px;box-shadow:var(--shadow);
+  }
+  .bal .lab{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .brow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:3px 0;font-size:13.5px;color:var(--muted)}
+  .brow b{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap}
+  .brow small{display:block;font-size:11.5px;line-height:1.3}
+  .bres{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-top:1px solid var(--line2);margin-top:8px;padding-top:10px}
+  .bres span{font-weight:600;font-size:15px}
+  .bres b{font-family:"IBM Plex Mono",monospace;font-size:24px;font-weight:600;line-height:1}
+  .bal.def .bres span,.bal.def .bres b{color:var(--good)}
+  .bal.sur .bres span,.bal.sur .bres b{color:var(--ochre)}
+  .bnote{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.45}
+  .bnote.warn{color:var(--ochre)}
 
   /* week */
   .day{
@@ -292,7 +394,7 @@
     backdrop-filter:blur(12px);border-top:1px solid var(--line);
     padding-bottom:env(safe-area-inset-bottom,0px);
   }
-  .tabs{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+  .tabs{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
   .tab{
     background:none;border:0;padding:9px 4px 10px;cursor:pointer;
     font-family:"Commissioner",sans-serif;font-size:11px;font-weight:600;color:var(--muted);
@@ -366,6 +468,24 @@
 
   <!-- ΣΗΜΕΡΑ -->
   <section id="v-today">
+    <div class="dayseg" id="daySeg"></div>
+    <div class="ynote hide" id="yNote"></div>
+
+    <div class="wcard">
+      <div class="lab" id="wLab">Πρωινό ζύγισμα</div>
+      <div class="field">
+        <label for="wIn">Βάρος</label>
+        <input id="wIn" type="number" step="0.1" inputmode="decimal" placeholder="73.5">
+        <button id="wSave">Αποθήκευση</button>
+      </div>
+      <div class="field">
+        <label for="cIn">Μέση</label>
+        <input id="cIn" type="number" step="0.5" inputmode="decimal" placeholder="εκ.">
+        <button id="cSave">Αποθήκευση</button>
+      </div>
+      <div class="ok" id="saveMsg"></div>
+    </div>
+
     <div class="sum">
       <div class="sum-top">
         <div class="sum-k"><span id="sEaten">0</span> <span>/ <b id="sGoal">0</b> kcal</span></div>
@@ -379,28 +499,35 @@
       </div>
     </div>
     <div id="todayList"></div>
+    <div id="balance"></div>
   </section>
 
   <!-- ΕΒΔΟΜΑΔΑ -->
   <section id="v-week" class="hide">
     <div id="weekList"></div>
-    <div class="note-box">Πάτα μια μέρα για να δεις τα γεύματά της. Ο μέσος όρος της βδομάδας είναι <b>2.488 kcal</b> — αυτό μετράει, όχι η κάθε μέρα.</div>
+    <div class="note-box">Πάτα μια μέρα για να δεις τα γεύματά της, και «Άνοιξε» για να τη συμπληρώσεις. Ο μέσος όρος της βδομάδας είναι <b>2.293 kcal</b> (πρωτεΐνη ~163γρ) — αυτό μετράει, όχι η κάθε μέρα.</div>
   </section>
 
   <!-- ΠΡΟΟΔΟΣ -->
   <section id="v-prog" class="hide">
-    <div class="eyebrow">Καταγραφή σήμερα</div>
-    <div class="field">
-      <label for="wIn">Βάρος</label>
-      <input id="wIn" type="number" step="0.1" inputmode="decimal" placeholder="73.5">
-      <button id="wSave">Αποθήκευση</button>
+
+    <div class="eyebrow" style="margin-top:16px">Ο μήνας σου</div>
+    <div class="stat">
+      <div class="calhead">
+        <button id="calPrev" aria-label="Προηγούμενος μήνας"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <b id="calTitle"></b>
+        <button id="calNext" aria-label="Επόμενος μήνας"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
+      <div class="calgrid" id="calGrid"></div>
+      <div class="calsum" id="calSum"></div>
+      <div class="calleg">
+        <span><i class="l-ok"></i>Στο πλάνο</span>
+        <span><i class="l-over"></i>Πλεόνασμα</span>
+        <span><i class="l-part"></i>Μισή καταγραφή</span>
+        <span><i class="l-none"></i>Τίποτα</span>
+      </div>
+      <div class="note" style="margin-top:8px">Πάτα μια μέρα για να την ανοίξεις και να τη συμπληρώσεις.</div>
     </div>
-    <div class="field">
-      <label for="cIn">Μέση</label>
-      <input id="cIn" type="number" step="0.5" inputmode="decimal" placeholder="εκατοστά">
-      <button id="cSave">Αποθήκευση</button>
-    </div>
-    <div class="ok" id="saveMsg"></div>
 
     <div class="eyebrow">Πού είσαι</div>
     <div class="grid2">
@@ -412,6 +539,7 @@
       <svg class="spark" id="spark" viewBox="0 0 300 64" preserveAspectRatio="none"></svg>
       <div class="note" id="sparkNote">Χρειάζονται τουλάχιστον δύο ζυγίσματα.</div>
     </div>
+    <div class="stat"><div class="lab">Ισοζύγιο 7 ημερών</div><div class="val" id="balAvg">—</div><div class="note" id="balN"></div></div>
     <div class="stat"><div class="lab">Μέση</div><div class="val" id="waistV">—</div><div class="note" id="waistN"></div></div>
 
     <div class="note-box warn"><b>Οι πρώτες δύο βδομάδες δεν μετράνε.</b> Η κρεατίνη τραβάει νερό — θα δεις μισό ως ενάμισι κιλό παραπάνω που δεν είναι λίπος.</div>
@@ -425,6 +553,7 @@
       <tr><td>Βάρος πάνω <b>και</b> μέση πάνω</td><td><b>−200 kcal</b></td></tr>
     </table>
     <div class="note-box">Ποτέ δύο αλλαγές ταυτόχρονα, και ποτέ αλλαγή από μία κακή βδομάδα — μόνο από τρεις-τέσσερις στη σειρά.</div>
+    <p class="foot" id="footNote"></p>
   </section>
 
   <!-- ΨΩΝΙΑ -->
@@ -437,30 +566,6 @@
     <div class="note-box">Οι ποσότητες βγαίνουν από τα γεύματα της βδομάδας, σε βάρος αγοράς. Το σύνολο μετράει μόνο ό,τι έχεις τσεκάρει. Το «Καθάρισμα» σβήνει τα τσεκαρίσματα αλλά <b>κρατάει τις τιμές</b>, ώστε να γίνει ο τιμοκατάλογός σου.</div>
   </section>
 
-  <!-- ΟΔΗΓΟΣ -->
-  <section id="v-guide" class="hide">
-    <h2>Οι στόχοι</h2>
-    <table>
-      <tr><th>Στόχος</th><th>Μέρα</th><th>Ανά κιλό</th></tr>
-      <tr><td><b>Θερμίδες</b></td><td>2.490</td><td>34</td></tr>
-      <tr><td><b>Πρωτεΐνη</b></td><td>154γρ</td><td>2,1γρ</td></tr>
-      <tr><td><b>Λιπαρά</b></td><td>85γρ</td><td>1,15γρ</td></tr>
-      <tr><td><b>Υδατάνθρακες</b></td><td>283γρ</td><td>3,85γρ</td></tr>
-    </table>
-    <div class="note-box">Συντήρηση 2.690 kcal. Τρως ~200 κάτω, με ψηλή πρωτεΐνη. Το βάρος μένει σχεδόν σταθερό, η μέση κατεβαίνει, η δύναμη ανεβαίνει.</div>
-
-    <h2>Παραλλαγές</h2>
-    <div id="guideVars"></div>
-
-    <h2>Κανόνες</h2>
-    <table>
-      <tr><td><b>Νερό</b></td><td>3 λίτρα τη μέρα. Όχι μισή ώρα πριν το φαγητό.</td></tr>
-      <tr><td><b>Ύπνος</b></td><td>7–9 ώρες. Κοιμήσου 23:00–23:30, και τα ΣΚ.</td></tr>
-      <tr><td><b>Κρεατίνη</b></td><td>5γρ κάθε μέρα, όποια ώρα, και τις μέρες ρεπό.</td></tr>
-      <tr><td><b>Ζύγισμα</b></td><td>Κάθε πρωί νηστικός. Μετράει ο μέσος όρος, όχι η μέρα.</td></tr>
-    </table>
-    <p class="foot" id="footNote"></p>
-  </section>
 </div>
 
 <nav>
@@ -468,7 +573,6 @@
     <button class="tab on" data-v="today"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Σήμερα</button>
     <button class="tab" data-v="week"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Εβδομάδα</button>
     <button class="tab" data-v="prog"><svg viewBox="0 0 24 24"><path d="M4 18l5-6 4 3 6-8"/><path d="M4 21h16"/></svg>Πρόοδος</button>
-    <button class="tab" data-v="guide"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>Οδηγός</button>
   </div>
 </nav>
 
@@ -506,20 +610,22 @@
 
 /* ---------- δεδομένα ---------- */
 var DAYS=["Δευτέρα","Τρίτη","Τετάρτη","Πέμπτη","Παρασκευή","Σάββατο","Κυριακή"];
+var DAYS_S=["Δε","Τρ","Τε","Πε","Πα","Σα","Κυ"];
+var DAYS_ACC=["τη Δευτέρα","την Τρίτη","την Τετάρτη","την Πέμπτη","την Παρασκευή","το Σάββατο","την Κυριακή"];
 var TRAIN=["w","l","w","l","w","r","r"];
 var TIMES=[["07:15","15:45","19:00","21:30"],["09:30","13:30","17:30","21:00"]];
 
-var B={n:"Γιαούρτι bowl",f:"Γιαούρτι 5% 250γρ, Βρώμη 50γρ, 10 Αμύγδαλα, Μπανάνα, Μέλι, ½ σκουπ Πρωτεΐνη",k:712,p:44,l:23,c:87};
-var S={n:"Ψωμί με μέλι",f:"2 φέτες Ψωμί με Μέλι, Μπανάνα, 10 Αμύγδαλα",k:395,p:12,l:9,c:73};
+var B={n:"Γιαούρτι bowl",f:"Γιαούρτι 5% 250γρ, Βρώμη 50γρ, 10 Αμύγδαλα, Μπανάνα, ½ κ.σ. Μέλι, ½ σκουπ Πρωτεΐνη",k:680,p:44,l:23,c:78};
+var S={n:"Milkshake",f:"Γάλα 250ml, ½ σκουπ Πρωτεΐνη, Μπανάνα",k:280,p:22,l:5,c:41};
 
 var MAIN=[
- {n:"Κοτόπουλο με πατάτες",f:"200γρ Κοτόπουλο, 300γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:848,p:74,l:22,c:85},
- {n:"Μοσχάρι κοκκινιστό",f:"200γρ Μοσχάρι, 250γρ Ρύζι, Σαλάτα",k:851,p:60,l:31,c:81},
- {n:"Φακές με φέτα",f:"2 κούπες Φακές, 60γρ Φέτα, 1 φ Ψωμί, Σαλάτα",k:861,p:51,l:29,c:104},
- {n:"Μακαρόνια με κιμά",f:"120γρ Μακαρόνια, 150γρ Κιμάς, 25γρ Τυρί, Σαλάτα",k:824,p:56,l:20,c:101},
+ {n:"Κοτόπουλο με πατάτες",f:"200γρ Κοτόπουλο, 250γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:810,p:73,l:22,c:76},
+ {n:"Μοσχάρι κοκκινιστό",f:"200γρ Μοσχάρι, 200γρ Ρύζι (βρασμένο), Σαλάτα",k:786,p:59,l:31,c:67},
+ {n:"Φακές με φέτα",f:"2 κούπες Φακές, 60γρ Φέτα, Σαλάτα (χωρίς ψωμί)",k:781,p:48,l:28,c:89},
+ {n:"Μακαρόνια με κιμά",f:"100γρ Μακαρόνια (ωμά), 150γρ Κιμάς, 25γρ Τυρί, Σαλάτα",k:753,p:53,l:20,c:86},
  {n:"Κοτόπουλο γύρος",f:"200γρ Μπούτι, 1 Πίτα, Τζατζίκι, Ντομάτα, Πατάτες",k:794,p:61,l:29,c:69},
- {n:"Ψάρι ψητό",f:"300γρ Ψάρι, 300γρ Πατάτα, Σαλάτα",k:821,p:74,l:27,c:70},
- {n:"Μπριζόλα με πατάτες",f:"250γρ Μπριζόλα, 300γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:1068,p:82,l:42,c:85}
+ {n:"Ψάρι ψητό",f:"300γρ Ψάρι, 250γρ Πατάτα, Σαλάτα",k:783,p:73,l:27,c:61},
+ {n:"Μπριζόλα με πατάτες",f:"250γρ Μπριζόλα, 250γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:1030,p:81,l:42,c:76}
 ];
 var DIN=[
  {n:"Αυγά με φέτα",f:"3 Αυγά, 50γρ Φέτα, Σαλάτα, 1 φ Ψωμί",k:554,p:34,l:36,c:25},
@@ -538,10 +644,10 @@ var VARS={
    {n:"Wrap κοτόπουλο",f:"Τορτίγια, 1 φ Τυρί, 80γρ Κοτόπουλο, Λαχανικά + ποτήρι Γάλα",k:520,p:46,l:16,c:45}],
  s:[S,
    {n:"Γιαούρτι",f:"Γιαούρτι 5% 200γρ με Μέλι + Φρούτο",k:333,p:18,l:10,c:45},
-   {n:"Milkshake",f:"Γάλα 250ml, ½ σκουπ Πρωτεΐνη, Μπανάνα",k:280,p:22,l:5,c:41},
+   {n:"Ψωμί με μέλι",f:"2 φέτες Ψωμί με Μέλι, Μπανάνα, 10 Αμύγδαλα",k:395,p:12,l:9,c:73},
    {n:"Φρυγανιές",f:"4 Φρυγανιές με Φυστικοβούτυρο + Φρούτο",k:358,p:10,l:13,c:53}],
- m:[{n:"Πένες με κοτόπουλο",f:"Πένες 120γρ, Κοτόπουλο 150γρ, Σάλτσα ντομάτας, 25γρ Τυρί",k:866,p:71,l:18,c:101},
-   {n:"Μπιφτέκια με πατάτες",f:"200γρ Μπιφτέκια, 300γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:792,p:54,l:25,c:85},
+ m:[{n:"Πένες με κοτόπουλο",f:"Πένες 100γρ (ωμές), Κοτόπουλο 150γρ, Σάλτσα ντομάτας, 25γρ Τυρί",k:795,p:68,l:18,c:86},
+   {n:"Μπιφτέκια με πατάτες",f:"200γρ Μπιφτέκια, 250γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:754,p:53,l:25,c:76},
    {n:"Παστίτσιο",f:"Μερίδα 350γρ + Σαλάτα",k:782,p:33,l:45,c:63},
    {n:"Wrap με μπιφτέκι",f:"2 Τορτίγιες, 150γρ Μπιφτέκια, Τζατζίκι, Λαχανικά",k:661,p:46,l:21,c:67}],
  d:[{n:"Αυγά με φέτα",f:"3 Αυγά, 50γρ Φέτα, Σαλάτα, 1 φ Ψωμί",k:554,p:34,l:36,c:25},
@@ -564,18 +670,18 @@ var SHOP=[
    ["s10","Τυρί σε φέτες","150γρ"],
    ["s11","Τριμμένο τυρί","1 μικρό"],
    ["s12","Αυγά","6"],
-   ["s13","Γάλα","1 λίτρο"]]],
+   ["s13","Γάλα","2 λίτρα"]]],
  ["Φρούτα & λαχανικά",[
    ["s14","Μπανάνες","14"],
    ["s15","Μήλα ή φρούτα εποχής","4"],
-   ["s16","Πατάτες","1,2 κιλά"],
+   ["s16","Πατάτες","1 κιλό"],
    ["s17","Σαλατικά (μαρούλι, ντομάτα, αγγούρι)","για 7 σαλάτες"],
    ["s18","Ντομάτες","4"],
    ["s19","Σπανάκι","300γρ"],
    ["s20","Αγγούρι για τζατζίκι","1"],
    ["s21","Κρεμμύδια & σκόρδο","—"]]],
  ["Ψωμί & ζυμαρικά",[
-   ["s22","Ψωμί ολικής ή τοστ","1 φρατζόλα (~22 φέτες)"],
+   ["s22","Ψωμί ολικής ή τοστ","1 μικρό (~8 φέτες)"],
    ["s23","Πίτες σουβλακιού","1 πακέτο"],
    ["s24","Αραβική πίτα","1 πακέτο"],
    ["s25","Μακαρόνια","1 πακέτο"],
@@ -583,14 +689,14 @@ var SHOP=[
  ["Ντουλάπι",[
    ["s27","Βρώμη","400γρ"],
    ["s28","Φακές","1 πακέτο"],
-   ["s29","Αμύγδαλα","200γρ"],
+   ["s29","Αμύγδαλα","100γρ"],
    ["s30","Καρύδια","100γρ"],
    ["s31","Μέλι","1 βάζο"],
    ["s32","Ελαιόλαδο","—"],
    ["s33","Σάλτσα ντομάτας","1 κουτί"],
    ["s34","Ρίγανη, πάπρικα, κανέλα","—"]]],
  ["Συμπληρώματα",[
-   ["s35","Whey protein","~110γρ τη βδομάδα"],
+   ["s35","Whey protein","~210γρ τη βδομάδα"],
    ["s36","Κρεατίνη monohydrate","5γρ τη μέρα"]]]
 ];
 
@@ -600,6 +706,85 @@ var SLOTS=["b","s","m","d"];
 /* ---------- state ---------- */
 var db=null, today=iso(new Date()), state={meals:{},swaps:{}}, hist=[], view="today", openDay=-1, sheetSlot=null, bought={}, price={}, enterSlot=null;
 var custom={b:[],s:[],m:[],d:[]};
+var lastRest=null;
+var vday=today;      /* η μέρα που βλέπει/συμπληρώνει: σήμερα ή χθες */
+function vdate(){ return new Date(vday+"T12:00:00"); }
+function vdi(){ return dow(vdate()); }
+function shiftDay(n){ var d=new Date(); d.setDate(d.getDate()+n); return iso(d); }
+function weekDates(){   /* Δευτέρα έως Κυριακή της τρέχουσας βδομάδας */
+  var out=[], t=new Date(); t.setDate(t.getDate()-dow(t));
+  for(var i=0;i<7;i++){ var d=new Date(t); d.setDate(t.getDate()+i); out.push(d); }
+  return out;
+}
+function dayTitle(){
+  if(vday===today)return "Σήμερα";
+  if(vday===shiftDay(-1))return "Χθες";
+  if(vday===shiftDay(1))return "Αύριο";
+  return DAYS[vdi()];
+}
+function hasData(r){
+  if(!r)return false;
+  if(typeof r.weight==="number"||typeof r.waist==="number"||typeof r.burnA==="number")return true;
+  if(r.meals){ for(var k in r.meals){ if(r.meals[k])return true; } }
+  return false;
+}
+/* ---------- ημερολόγιο μήνα ---------- */
+var MONTHS=["Ιανουάριος","Φεβρουάριος","Μάρτιος","Απρίλιος","Μάιος","Ιούνιος","Ιούλιος","Αύγουστος","Σεπτέμβριος","Οκτώβριος","Νοέμβριος","Δεκέμβριος"];
+var calY=new Date().getFullYear(), calM=new Date().getMonth();
+/* ok: όλα τα γεύματα τσεκαρισμένα και (αν έχει ρολόι) έλλειμμα · over: πλεόνασμα · part: κάτι γράφτηκε αλλά όχι όλα */
+function dayStatus(r){
+  if(!hasData(r))return "none";
+  var nm=0; if(r.meals){ for(var k in r.meals){ if(r.meals[k])nm++; } }
+  if(nm<4)return "part";
+  if(typeof r.burnA==="number"){
+    var rr=restOf(r.burnR);
+    if(typeof rr==="number"){
+      var di=dow(new Date(r.date+"T12:00:00"));
+      return eatenOf(di,r.meals,r.swaps).k-(r.burnA+rr)<=0?"ok":"over";
+    }
+  }
+  return "ok";
+}
+function renderCal(){
+  var byDate={}; hist.forEach(function(r){ byDate[r.date]=r; });
+  byDate[vday]={date:vday,meals:state.meals,swaps:state.swaps,weight:state.weight,waist:state.waist,burnA:state.burnA,burnR:state.burnR};
+  var first=new Date(calY,calM,1), days=new Date(calY,calM+1,0).getDate(), lead=dow(first);
+  var html=DAYS_S.map(function(d){return '<div class="wd">'+d+'</div>';}).join("");
+  for(var i=0;i<lead;i++)html+='<div></div>';
+  var cnt={ok:0,over:0,part:0};
+  for(var d=1;d<=days;d++){
+    var k=iso(new Date(calY,calM,d)), cls;
+    if(k>today)cls="fut";
+    else{ var st=dayStatus(byDate[k]); cls=st==="none"?"none":"s-"+st; if(cnt[st]!==undefined)cnt[st]++; }
+    if(k===today)cls+=" tod";
+    html+='<button class="cd '+cls+'" data-cal="'+k+'"'+(k>today?" disabled":"")+'>'+d+'</button>';
+  }
+  $("calGrid").innerHTML=html;
+  $("calTitle").textContent=MONTHS[calM]+" "+calY;
+  var now=new Date();
+  $("calNext").disabled=calY>now.getFullYear()||(calY===now.getFullYear()&&calM>=now.getMonth());
+  $("calSum").innerHTML=
+    '<div><b style="color:var(--good)">'+cnt.ok+'</b><span>στο πλάνο</span></div>'+
+    '<div><b style="color:var(--ochre)">'+cnt.over+'</b><span>πλεόνασμα</span></div>'+
+    '<div><b>'+cnt.part+'</b><span>μισές</span></div>';
+}
+$("calPrev").addEventListener("click",function(){ calM--; if(calM<0){calM=11;calY--;} renderCal(); });
+$("calNext").addEventListener("click",function(){ calM++; if(calM>11){calM=0;calY++;} renderCal(); });
+$("calGrid").addEventListener("click",function(e){
+  var b=e.target.closest("[data-cal]"); if(!b||b.disabled)return;
+  loadDay(b.dataset.cal); go("today");
+});
+
+function renderStrip(){
+  var byDate={}; hist.forEach(function(r){ byDate[r.date]=r; });
+  byDate[vday]={meals:state.meals,weight:state.weight,waist:state.waist,burnA:state.burnA};
+  $("daySeg").innerHTML=weekDates().map(function(d,i){
+    var k=iso(d);
+    return '<button data-date="'+k+'" class="'+(k===vday?"on ":"")+(k===today?"today ":"")+(hasData(byDate[k])?"has":"")+'"'+
+      ' aria-label="'+DAYS[i]+'">'+
+      '<span class="dn">'+DAYS_S[i]+'</span><span class="dd">'+d.getDate()+'</span><i class="dt"></i></button>';
+  }).join("");
+}   /* τελευταίες θερμίδες ηρεμίας που έβαλε — αλλάζουν λίγο από μέρα σε μέρα */
 
 function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function dow(d){return (d.getDay()+6)%7;}           /* Δευτέρα = 0 */
@@ -621,20 +806,22 @@ function isMine(slot,name){
 }
 function defName(di,slot){ return slot==="b"?B.n:slot==="s"?S.n:(slot==="m"?MAIN[di].n:DIN[di].n); }
 function pickMeal(slot,name){
-  var di=dow(new Date());
+  var di=vdi();
   if(name===defName(di,slot))delete state.swaps[slot]; else state.swaps[slot]=name;
 }
 function cycleMeal(slot,dir){
-  var di=dow(new Date()), list=optsFor(di,slot), cur=mealFor(di,slot), i=0;
+  var di=vdi(), list=optsFor(di,slot), cur=mealFor(di,slot), i=0;
   for(var q=0;q<list.length;q++){ if(list[q].n===cur.n){i=q;break;} }
   var j=(i+dir+list.length)%list.length;
   pickMeal(slot,list[j].n);
   enterSlot={slot:slot,dir:dir>0?"L":"R"};
+  upsertHist({meals:state.meals,swaps:state.swaps});
   renderToday(); saveDay();
 }
 
-function mealFor(di,slot){
-  var sw=state.swaps&&state.swaps[slot];
+function mealFor(di,slot){ return mealForSw(di,slot,state.swaps); }
+function mealForSw(di,slot,swaps){
+  var sw=swaps&&swaps[slot];
   if(sw){var list=optsFor(di,slot);for(var i=0;i<list.length;i++){if(list[i].n===sw)return list[i];}}
   if(slot==="b")return B; if(slot==="s")return S;
   return slot==="m"?MAIN[di]:DIN[di];
@@ -650,7 +837,7 @@ function dayTotal(di,useSwaps){
 
 /* ---------- render: σήμερα ---------- */
 function renderToday(){
-  var d=new Date(), di=dow(d), weekend=di>5||di===5, times=TIMES[di>=5?1:0];
+  var d=vdate(), di=dow(d), weekend=di>5||di===5, times=TIMES[di>=5?1:0];
   var eaten={k:0,p:0,l:0,c:0}, goal=dayTotal(di,true);
   var html="";
   SLOTS.forEach(function(slot,i){
@@ -659,8 +846,15 @@ function renderToday(){
     if(slot==="m"){
       var t=TRAIN[di];
       html+='<div class="train'+(t==="r"?" rest":"")+'">'+
-        '<b>'+(t==="w"?"Βάρη":t==="l"?"Περπάτημα ή handstand":"Ρεπό")+'</b>'+
-        (t==="r"?"":'<span>'+(weekend?"—":"17:00–18:00")+'</span>')+'</div>';
+        '<div class="trow"><b>'+(t==="w"?"Βάρη":t==="l"?"Περπάτημα ή handstand":"Ρεπό")+'</b>'+
+        (t==="r"?"":'<span>'+(weekend?"—":"17:00–18:00")+'</span>')+'</div>'+
+        '<div class="burn">'+
+          burnField("burnA","Ενεργές",state.burnA,"0")+
+          burnField("burnR","Ηρεμίας",state.burnR,typeof lastRest==="number"?String(lastRest):"0")+
+        '</div>'+
+        '<div class="bhint">Από το Apple Watch, το βράδυ. Ενεργές: ο κόκκινος κύκλος. '+
+        'Ηρεμίας: Υγεία → Ενέργεια ηρεμίας (Resting Energy).</div>'+
+        '</div>';
     }
     var opts=optsFor(di,slot), idx=0;
     for(var q=0;q<opts.length;q++){ if(opts[q].n===m.n){idx=q;break;} }
@@ -691,7 +885,77 @@ function renderToday(){
   $("sBar").style.width=pct+"%";
   $("sLeft").textContent=eaten.k>=goal.k?"ολοκληρώθηκε":("απομένουν "+(goal.k-eaten.k).toLocaleString("el-GR"));
   $("mP").textContent=eaten.p+"γρ"; $("mF").textContent=eaten.l+"γρ"; $("mC").textContent=eaten.c+"γρ";
-  $("hSub").textContent=DAYS[di]+" · "+new Date().toLocaleDateString("el-GR",{day:"numeric",month:"short"});
+  $("hSub").textContent=DAYS[di]+" · "+d.toLocaleDateString("el-GR",{day:"numeric",month:"short"});
+  if(view==="today")$("hTitle").textContent=dayTitle();
+  renderStrip();
+  $("yNote").classList.toggle("hide",vday===today);
+  $("yNote").textContent=vday<today
+    ? "Βλέπεις "+DAYS_ACC[di]+". Ό,τι συμπληρώσεις αποθηκεύεται σε αυτή τη μέρα."
+    : "Αυτό είναι το πρόγραμμα για "+DAYS_ACC[di]+".";
+  $("wLab").textContent=vday===today?"Πρωινό ζύγισμα":"Ζύγισμα · "+DAYS[di];
+  renderBalance();
+}
+
+/* ---------- θερμίδες που έκαψε + ισοζύγιο ---------- */
+function burnField(id,label,val,ph){
+  return '<div><label for="'+id+'">'+label+'</label><div class="bin">'+
+    '<input id="'+id+'" data-burn="'+id+'" type="number" min="0" step="1" inputmode="numeric" '+
+    'placeholder="'+ph+'" value="'+(typeof val==="number"?val:"")+'"><span>kcal</span></div></div>';
+}
+function fmt(n){ return Math.round(n).toLocaleString("el-GR"); }
+function eatenOf(di,meals,swaps){
+  var k=0,n=0;
+  SLOTS.forEach(function(s){ if(meals&&meals[s]){ k+=mealForSw(di,s,swaps).k; n++; } });
+  return {k:k,n:n};
+}
+function restOf(r){ return typeof r==="number"?r:(typeof lastRest==="number"?lastRest:null); }
+function renderBalance(){
+  var di=vdi(), e=eatenOf(di,state.meals,state.swaps);
+  var a=state.burnA, r=restOf(state.burnR), el=$("balance");
+  var head='<div class="lab">Ισοζύγιο ημέρας</div>';
+  if(typeof a!=="number"){
+    el.innerHTML='<div class="bal">'+head+'<div class="bnote" style="margin-top:0">Γράψε τις θερμίδες του Apple Watch '+
+      'στη λωρίδα της άσκησης. Εδώ θα δεις αν ήσουν σε έλλειμμα.</div></div>';
+    return;
+  }
+  if(typeof r!=="number"){
+    el.innerHTML='<div class="bal">'+head+'<div class="bnote warn" style="margin-top:0">Βάλε και τις θερμίδες ηρεμίας. '+
+      'Χωρίς αυτές λείπει το μεγαλύτερο κομμάτι από όσα καις.</div></div>';
+    return;
+  }
+  var burned=a+r, diff=e.k-burned, cls=diff<0?"def":"sur";
+  var word=diff<0?"Έλλειμμα":diff>0?"Πλεόνασμα":"Ισοφάριση";
+  var verdict;
+  if(diff<=-700)verdict="Μεγάλο έλλειμμα. Μια μέρα δεν πειράζει, αλλά αν γίνεται συχνά θα πέσει η δύναμη.";
+  else if(diff<0)verdict="Είσαι κάτω από όσα έκαψες. Αυτό θέλει το πλάνο (περίπου 200 κάτω).";
+  else if(diff===0)verdict="Έφαγες ακριβώς όσα έκαψες.";
+  else verdict="Έφαγες παραπάνω από όσα έκαψες. Μία μέρα δεν αλλάζει κάτι, μετράει η βδομάδα.";
+  var restNote=typeof state.burnR==="number"?"":" · τελευταία τιμή";
+  el.innerHTML='<div class="bal '+cls+'">'+head+
+    '<div class="brow"><div>Έφαγες<small>'+e.n+' από 4 γεύματα τσεκαρισμένα</small></div><b>'+fmt(e.k)+' kcal</b></div>'+
+    '<div class="brow"><div>Έκαψες<small>ηρεμίας '+fmt(r)+restNote+' + ενεργές '+fmt(a)+'</small></div><b>'+fmt(burned)+' kcal</b></div>'+
+    '<div class="bres"><span>'+word+'</span><b>'+(diff>0?"+":diff<0?"−":"")+fmt(Math.abs(diff))+' kcal</b></div>'+
+    (e.n===4?'<div class="bnote">'+verdict+'</div>':'')+
+    (e.n<4?'<div class="bnote warn">Τσέκαρε όλα όσα έφαγες, αλλιώς το έλλειμμα βγαίνει μεγαλύτερο απ\' ό,τι είναι.</div>':'')+
+    '<div class="bnote">Το ρολόι συνήθως λέει λίγο παραπάνω ενεργές θερμίδες από τις πραγματικές. '+
+    'Εμπιστέψου τον μέσο όρο της βδομάδας και τη ζυγαριά, όχι τη μία μέρα.</div>'+
+    '</div>';
+}
+function weekBalance(){
+  var start=new Date(); start.setDate(start.getDate()-6);
+  var a=iso(start), sum=0, n=0;
+  function add(row){
+    if(typeof row.burnA!=="number")return;
+    var r=restOf(row.burnR); if(typeof r!=="number")return;
+    var di=dow(new Date(row.date+"T12:00:00"));
+    sum+=eatenOf(di,row.meals,row.swaps).k-(row.burnA+r); n++;
+  }
+  hist.forEach(function(row){
+    if(row.date===vday)return;
+    if(row.date>=a&&row.date<=today)add(row);
+  });
+  if(vday>=a&&vday<=today)add({date:vday,meals:state.meals,swaps:state.swaps,burnA:state.burnA,burnR:state.burnR});
+  return n?{avg:sum/n,n:n}:null;
 }
 
 /* ---------- render: εβδομάδα ---------- */
@@ -707,26 +971,13 @@ function renderWeek(){
         ? SLOTS.map(function(s){var m=s==="b"?B:s==="s"?S:(s==="m"?MAIN[i]:DIN[i]);
             return '<div style="margin-top:6px"><b style="color:var(--ink)">'+esc(m.n)+'</b><br>'+esc(m.f)+'</div>';}).join("")
         : esc(MAIN[i].n+" · "+DIN[i].n))+'</div>'+
-      (openDay===i?'<div class="dnums" style="margin-top:8px">Π '+t.p+'γρ · Λ '+t.l+'γρ · Υ '+t.c+'γρ</div>':'')+
+      (openDay===i?'<div class="dnums" style="margin-top:8px">Π '+t.p+'γρ · Λ '+t.l+'γρ · Υ '+t.c+'γρ</div>'+
+        '<button class="swap" style="margin-top:9px" data-open="'+i+'">Άνοιξε '+DAYS_ACC[i]+'</button>':'')+
       '</div>';
   }
   $("weekList").innerHTML=html;
 }
 
-/* ---------- render: οδηγός ---------- */
-function renderGuide(){
-  var html="";
-  SLOTS.forEach(function(s){
-    html+='<div class="eyebrow" style="margin-top:14px">'+SLOTN[s]+'</div><table>';
-    VARS[s].forEach(function(m){
-      html+='<tr><td><b>'+esc(m.n)+'</b><br><span style="color:var(--muted);font-size:12.5px">'+esc(m.f)+'</span></td>'+
-        '<td style="white-space:nowrap;font-family:\'IBM Plex Mono\',monospace;font-size:11.5px;color:var(--muted)">'+
-        '<b style="color:var(--ink)">'+m.k+'</b><br>Π '+m.p+'<br>Λ '+m.l+'<br>Υ '+m.c+'</td></tr>';
-    });
-    html+='</table>';
-  });
-  $("guideVars").innerHTML=html;
-}
 
 /* ---------- render: ψώνια ---------- */
 function renderShop(){
@@ -762,6 +1013,7 @@ function weekAvg(offset){
   return {avg:v.reduce(function(x,y){return x+y;},0)/v.length,n:v.length};
 }
 function renderProg(){
+  renderCal();
   var now=weekAvg(0), prev=weekAvg(1);
   $("avgNow").textContent=now?now.avg.toFixed(1)+" kg":"—";
   $("avgN").textContent=now?(now.n+" "+(now.n===1?"ζύγισμα":"ζυγίσματα")+" αυτή τη βδομάδα"):"Δεν έχεις ζυγιστεί ακόμα.";
@@ -787,6 +1039,12 @@ function renderProg(){
     $("sparkNote").textContent=pts.length+" ζυγίσματα · "+lo.toFixed(1)+"–"+hi.toFixed(1)+" kg";
   }else{ sp.innerHTML=""; $("sparkNote").textContent="Χρειάζονται τουλάχιστον δύο ζυγίσματα."; }
 
+  var wb=weekBalance();
+  if(wb){
+    $("balAvg").textContent=(wb.avg>0?"+":wb.avg<0?"−":"")+fmt(Math.abs(wb.avg))+" kcal";
+    $("balN").textContent=(wb.avg<0?"Έλλειμμα":"Πλεόνασμα")+" τη μέρα, κατά μέσο όρο · "+wb.n+" "+(wb.n===1?"μέρα":"μέρες")+" με μετρήσεις";
+  }else{ $("balAvg").textContent="—"; $("balN").textContent="Γράψε τις θερμίδες του Apple Watch στην καρτέλα Σήμερα."; }
+
   var ws2=hist.filter(function(r){return typeof r.waist==="number";});
   if(ws2.length){
     var lastW=ws2[ws2.length-1];
@@ -811,7 +1069,7 @@ var store={
     return Promise.resolve();
   },
   days:function(){
-    if(db)return db.collection("days").orderBy("date","desc").limit(70).get()
+    if(db)return db.collection("days").orderBy("date","desc").limit(400).get()
       .then(function(q){return q.docs.map(function(x){return x.data();});}).catch(function(){return [];});
     var out=[];
     try{
@@ -832,10 +1090,12 @@ var store={
   }
 };
 function saveDay(){
-  var body={date:today,meals:state.meals,swaps:state.swaps};
+  var body={date:vday,meals:state.meals,swaps:state.swaps};
   if(typeof state.weight==="number")body.weight=state.weight;
   if(typeof state.waist==="number")body.waist=state.waist;
-  return store.setDay(today,body);
+  if(typeof state.burnA==="number")body.burnA=state.burnA;
+  if(typeof state.burnR==="number")body.burnR=state.burnR;
+  return store.setDay(vday,body);
 }
 function saveShop(){ return store.set("shop",{bought:bought,price:price}); }
 function flash(t){ var e=$("saveMsg"); e.textContent=t; setTimeout(function(){e.textContent="";},2200); }
@@ -845,8 +1105,8 @@ function go(v){
   view=v;
   document.querySelectorAll(".tab").forEach(function(x){x.classList.toggle("on",x.dataset.v===v);});
   $("shopBtn").classList.toggle("on",v==="shop");
-  ["today","week","shop","prog","guide"].forEach(function(k){ $("v-"+k).classList.toggle("hide",k!==v); });
-  $("hTitle").textContent={today:"Σήμερα",week:"Η εβδομάδα",shop:"Ψώνια",prog:"Πρόοδος",guide:"Οδηγός"}[v];
+  ["today","week","shop","prog"].forEach(function(k){ $("v-"+k).classList.toggle("hide",k!==v); });
+  $("hTitle").textContent={today:dayTitle(),week:"Η εβδομάδα",shop:"Ψώνια",prog:"Πρόοδος"}[v];
   if(v==="today"){renderToday();}else{$("hSub").textContent="";}
   if(v==="week")renderWeek();
   if(v==="shop")renderShop();
@@ -863,7 +1123,21 @@ $("todayList").addEventListener("click",function(e){
   var card=e.target.closest(".meal"); if(!card)return;
   var slot=card.dataset.slot;
   state.meals[slot]=!state.meals[slot];
+  upsertHist({meals:state.meals,swaps:state.swaps});
   renderToday(); saveDay();
+});
+
+$("todayList").addEventListener("input",function(e){
+  var f=e.target.closest("[data-burn]"); if(!f)return;
+  var k=f.dataset.burn, v=parseFloat(f.value);
+  if(isNaN(v)||v<0||v>9999)delete state[k]; else state[k]=Math.round(v);
+  renderBalance();   /* χωρίς redraw της λίστας, για να μη χαθεί το πληκτρολόγιο */
+});
+$("todayList").addEventListener("change",function(e){
+  if(!e.target.closest("[data-burn]"))return;
+  if(typeof state.burnR==="number"&&state.burnR!==lastRest){ lastRest=state.burnR; store.set("burn",{rest:lastRest}); }
+  upsertHist({burnA:state.burnA,burnR:state.burnR,meals:state.meals,swaps:state.swaps});
+  saveDay(); renderStrip();
 });
 
 /* ---------- swipe στις κάρτες των γευμάτων ---------- */
@@ -939,12 +1213,14 @@ $("shopReset").addEventListener("click",function(){
 });
 
 $("weekList").addEventListener("click",function(e){
+  var o=e.target.closest("[data-open]");
+  if(o){ loadDay(iso(weekDates()[+o.dataset.open])); go("today"); return; }
   var d=e.target.closest("[data-day]"); if(!d)return;
   var i=+d.dataset.day; openDay=(openDay===i?-1:i); renderWeek();
 });
 
 function renderSheetOpts(){
-  var slot=sheetSlot, di=dow(new Date()), cur=mealFor(di,slot), list=optsFor(di,slot);
+  var slot=sheetSlot, di=vdi(), cur=mealFor(di,slot), list=optsFor(di,slot);
   $("sheetOpts").innerHTML=list.map(function(m){
     var mine=isMine(slot,m.n);
     return '<button class="opt'+(m.n===cur.n?" sel":"")+(mine?" own":"")+'" data-n="'+esc(m.n)+'">'+
@@ -1001,7 +1277,7 @@ $("fSave").addEventListener("click",function(){
   var slot=sheetSlot;
   var n=$("fName").value.trim();
   if(!n){ flash("Βάλε ένα όνομα στο φαγητό."); $("fName").focus(); return; }
-  var di=dow(new Date()), list=optsFor(di,slot);
+  var di=vdi(), list=optsFor(di,slot);
   for(var i=0;i<list.length;i++){ if(list[i].n===n){ flash("Υπάρχει ήδη φαγητό με αυτό το όνομα."); return; } }
   function num(id){ var v=parseFloat($(id).value); return isNaN(v)||v<0?0:Math.round(v); }
   var p=num("fP"), l=num("fL"), c=num("fC"), k=num("fK");
@@ -1018,39 +1294,54 @@ $("fSave").addEventListener("click",function(){
 $("wSave").addEventListener("click",function(){
   var v=parseFloat($("wIn").value); if(isNaN(v)||v<30||v>250){flash("Βάλε βάρος σε κιλά.");return;}
   state.weight=v; upsertHist({weight:v});
-  saveDay().then(function(){ flash("Το βάρος αποθηκεύτηκε."); renderProg(); });
+  saveDay().then(function(){ flash("Το βάρος αποθηκεύτηκε: "+v.toFixed(1).replace(".",",")+" kg"); renderProg(); renderStrip(); });
 });
 $("cSave").addEventListener("click",function(){
   var v=parseFloat($("cIn").value); if(isNaN(v)||v<40||v>200){flash("Βάλε μέση σε εκατοστά.");return;}
   state.waist=v; upsertHist({waist:v});
-  saveDay().then(function(){ flash("Η μέση αποθηκεύτηκε."); renderProg(); });
+  saveDay().then(function(){ flash("Η μέση αποθηκεύτηκε: "+v+" εκ."); renderProg(); renderStrip(); });
 });
 function upsertHist(patch){
   var row=null;
-  for(var i=0;i<hist.length;i++){ if(hist[i].date===today){row=hist[i];break;} }
-  if(!row){ row={date:today}; hist.push(row); hist.sort(function(a,b){return a.date<b.date?-1:1;}); }
+  for(var i=0;i<hist.length;i++){ if(hist[i].date===vday){row=hist[i];break;} }
+  if(!row){ row={date:vday}; hist.push(row); hist.sort(function(a,b){return a.date<b.date?-1:1;}); }
   Object.keys(patch).forEach(function(k){ row[k]=patch[k]; });
 }
 
 /* ---------- boot ---------- */
-renderToday(); renderWeek(); renderShop(); renderGuide(); renderProg();
+renderToday(); renderWeek(); renderShop(); renderProg();
 
-function hydrate(){
-  store.getDay(today).then(function(d){
+function loadDay(date){
+  vday=date; state={meals:{},swaps:{}};
+  $("wIn").value=""; $("cIn").value=""; $("saveMsg").textContent="";
+  renderToday();
+  store.getDay(date).then(function(d){
+    if(vday!==date)return;          /* άλλαξε μέρα όσο φόρτωνε */
     if(d){
       state.meals=d.meals||{}; state.swaps=d.swaps||{};
       if(typeof d.weight==="number"){state.weight=d.weight;$("wIn").value=d.weight;}
       if(typeof d.waist==="number"){state.waist=d.waist;$("cIn").value=d.waist;}
-      renderToday();
+      if(typeof d.burnA==="number")state.burnA=d.burnA;
+      if(typeof d.burnR==="number")state.burnR=d.burnR;
     }
+    renderToday(); renderProg();
   });
+}
+$("daySeg").addEventListener("click",function(e){
+  var b=e.target.closest("[data-date]"); if(!b)return;
+  if(b.dataset.date!==vday){ loadDay(b.dataset.date); }
+});
+
+function hydrate(){
+  loadDay(today);
   store.get("shop").then(function(d){ if(d){ bought=d.bought||{}; price=d.price||{}; renderShop(); } });
+  store.get("burn").then(function(d){ if(d&&typeof d.rest==="number"){ lastRest=d.rest; renderToday(); renderProg(); } });
   store.get("custom").then(function(d){
     if(d){ SLOTS.forEach(function(k){ if(Array.isArray(d[k]))custom[k]=d[k]; }); renderToday(); renderWeek(); }
   });
   store.days().then(function(rows){
     hist=rows.filter(function(r){return r&&r.date;}).sort(function(a,b){return a.date<b.date?-1:1;});
-    renderProg();
+    renderProg(); renderStrip();
   });
 }
 
