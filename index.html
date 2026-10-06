@@ -394,7 +394,7 @@
     backdrop-filter:blur(12px);border-top:1px solid var(--line);
     padding-bottom:env(safe-area-inset-bottom,0px);
   }
-  .tabs{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+  .tabs{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(2,1fr)}
   .tab{
     background:none;border:0;padding:9px 4px 10px;cursor:pointer;
     font-family:"Commissioner",sans-serif;font-size:11px;font-weight:600;color:var(--muted);
@@ -449,6 +449,30 @@
   .hide{display:none!important}
   .foot{font-size:11.5px;color:var(--muted);margin:22px 0 0;line-height:1.5}
   .ok{font-size:12.5px;color:var(--good);font-weight:600;margin-top:6px;min-height:16px}
+
+  /* ημερολόγιο φαγητών */
+  .lg{
+    display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:10px 6px 10px 14px;margin-bottom:7px;box-shadow:var(--shadow);
+  }
+  .lgb{flex:1;min-width:0}
+  .lgn{font-weight:600;font-size:15px;line-height:1.3}
+  .lgnums{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);margin-top:3px}
+  .lgnums b{color:var(--ink);font-weight:600}
+  .lgx{
+    flex:none;width:36px;height:36px;border-radius:10px;border:0;background:transparent;
+    color:var(--muted);display:grid;place-items:center;cursor:pointer;padding:0;
+  }
+  .lgx:active{background:var(--card2)}
+  .lgx svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round}
+  .empty{font-size:13.5px;color:var(--muted);padding:6px 2px 10px}
+  .addfood{margin:2px 0 0;color:var(--ink);border-color:color-mix(in srgb,var(--muted) 55%,transparent)}
+  .search{
+    width:100%;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:11px;
+    padding:11px 13px;font-family:"Commissioner",sans-serif;font-size:16px;margin-bottom:12px;
+  }
+  .search:focus{outline:2px solid var(--dark);outline-offset:1px}
+  .sgroup{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:4px 0 7px}
 </style>
 </head>
 <body>
@@ -498,14 +522,10 @@
         <div class="macro"><b id="mC">0γρ</b><span>υδατ.</span></div>
       </div>
     </div>
-    <div id="todayList"></div>
+    <div class="eyebrow">Τι έφαγες</div>
+    <div id="logList"></div>
+    <div id="trainBox"></div>
     <div id="balance"></div>
-  </section>
-
-  <!-- ΕΒΔΟΜΑΔΑ -->
-  <section id="v-week" class="hide">
-    <div id="weekList"></div>
-    <div class="note-box">Πάτα μια μέρα για να δεις τα γεύματά της, και «Άνοιξε» για να τη συμπληρώσεις. Ο μέσος όρος της βδομάδας είναι <b>2.293 kcal</b> (πρωτεΐνη ~161γρ) — αυτό μετράει, όχι η κάθε μέρα.</div>
   </section>
 
   <!-- ΠΡΟΟΔΟΣ -->
@@ -521,7 +541,7 @@
       <div class="calgrid" id="calGrid"></div>
       <div class="calsum" id="calSum"></div>
       <div class="calleg">
-        <span><i class="l-ok"></i>Στο πλάνο</span>
+        <span><i class="l-ok"></i>Στον στόχο</span>
         <span><i class="l-over"></i>Πλεόνασμα</span>
         <span><i class="l-part"></i>Μισή καταγραφή</span>
         <span><i class="l-none"></i>Τίποτα</span>
@@ -563,7 +583,7 @@
       <button id="shopReset">Καθάρισμα</button>
     </div>
     <div id="shopList"></div>
-    <div class="note-box">Οι ποσότητες βγαίνουν από τα γεύματα της βδομάδας, σε βάρος αγοράς. Το σύνολο μετράει μόνο ό,τι έχεις τσεκάρει. Το «Καθάρισμα» σβήνει τα τσεκαρίσματα αλλά <b>κρατάει τις τιμές</b>, ώστε να γίνει ο τιμοκατάλογός σου.</div>
+    <div class="note-box">Οι ποσότητες είναι για μία βδομάδα, σε βάρος αγοράς. Το σύνολο μετράει μόνο ό,τι έχεις τσεκάρει. Το «Καθάρισμα» σβήνει τα τσεκαρίσματα αλλά <b>κρατάει τις τιμές</b>, ώστε να γίνει ο τιμοκατάλογός σου.</div>
   </section>
 
 </div>
@@ -571,7 +591,6 @@
 <nav>
   <div class="tabs">
     <button class="tab on" data-v="today"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Σήμερα</button>
-    <button class="tab" data-v="week"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Εβδομάδα</button>
     <button class="tab" data-v="prog"><svg viewBox="0 0 24 24"><path d="M4 18l5-6 4 3 6-8"/><path d="M4 21h16"/></svg>Πρόοδος</button>
   </div>
 </nav>
@@ -579,10 +598,13 @@
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet">
   <div class="handle"></div>
-  <h2 id="sheetTitle" style="margin:0 0 4px">Παραλλαγές</h2>
+  <h2 id="sheetTitle" style="margin:0 0 4px">Τι έφαγες;</h2>
   <p style="font-size:13px;color:var(--muted);margin:0 0 14px" id="sheetSub"></p>
-  <div id="sheetOpts"></div>
-  <button class="addbtn" id="sheetAdd">+ Δικό μου φαγητό</button>
+  <div id="sheetList">
+    <input class="search" id="fSearch" type="search" placeholder="Αναζήτηση φαγητού" autocomplete="off">
+    <div id="sheetOpts"></div>
+    <button class="addbtn" id="sheetAdd">+ Δικό μου φαγητό</button>
+  </div>
 
   <div id="sheetForm" class="hide">
     <div class="frow"><label for="fName">Όνομα</label><input id="fName" type="text" placeholder="π.χ. Ομελέτα με τυρί"></div>
@@ -613,48 +635,45 @@ var DAYS=["Δευτέρα","Τρίτη","Τετάρτη","Πέμπτη","Παρ�
 var DAYS_S=["Δε","Τρ","Τε","Πε","Πα","Σα","Κυ"];
 var DAYS_ACC=["τη Δευτέρα","την Τρίτη","την Τετάρτη","την Πέμπτη","την Παρασκευή","το Σάββατο","την Κυριακή"];
 var TRAIN=["w","l","w","l","w","r","r"];
-var TIMES=[["07:15","15:45","19:00","21:30"],["09:30","13:30","17:30","21:00"]];
+var GOAL={k:2000,p:155};   /* recomposition: ~200 kcal κάτω από τη συντήρηση, ~2γρ/κιλό πρωτεΐνη */
 
-var B={n:"Γιαούρτι bowl",f:"Γιαούρτι 5% 250γρ, Βρώμη 50γρ, 10 Αμύγδαλα, Μπανάνα, ½ κ.σ. Μέλι, ½ σκουπ Πρωτεΐνη",k:680,p:44,l:23,c:78};
-var S={n:"Μπάρα πρωτεΐνης",f:"Μπάρα πρωτεΐνης + Φρούτο",k:280,p:20,l:7,c:40};
-
-var MAIN=[
+/* όλα τα φαγητά σε μία λίστα — διαλέγεις ό,τι έφαγες */
+var FOODS=[
+ {n:"Γιαούρτι bowl",f:"Γιαούρτι 5% 250γρ, Βρώμη 50γρ, 10 Αμύγδαλα, Μπανάνα, ½ κ.σ. Μέλι, ½ σκουπ Πρωτεΐνη",k:680,p:44,l:23,c:78},
+ {n:"Pancakes βρώμης",f:"Βρώμη 80γρ, Γάλα 150ml, Μπανάνα, 1 σκουπ Πρωτεΐνη, Μπέικιν, Μέλι",k:642,p:41,l:10,c:104},
+ {n:"Shake στο shaker",f:"1 σκουπ Πρωτεΐνη + 50γρ Βρώμη στο shaker από το βράδυ. Το πρωί 300ml Γάλα + Μπανάνα",k:560,p:42,l:10,c:78},
+ {n:"Μπάρα πρωτεΐνης",f:"Μπάρα πρωτεΐνης + Φρούτο",k:280,p:20,l:7,c:40},
+ {n:"Ψωμί με μέλι",f:"2 φέτες Ψωμί με Μέλι, Μπανάνα, 10 Αμύγδαλα",k:395,p:12,l:9,c:73},
+ {n:"Φρυγανιές",f:"4 Φρυγανιές με Φυστικοβούτυρο + Φρούτο",k:358,p:10,l:13,c:53},
+ {n:"Κεφίρ πρωτεΐνης",f:"Μπουκάλι Κεφίρ πρωτεΐνης Όλυμπος",k:199,p:26,l:2,c:26},
  {n:"Κοτόπουλο με πατάτες",f:"200γρ Κοτόπουλο, 250γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:810,p:73,l:22,c:76},
+ {n:"Κοτόπουλο με τηγανητές",f:"250γρ Μπούτι κοτόπουλο (ωμό), 250γρ Πατάτες τηγανητές (ωμό βάρος)",k:650,p:53,l:30,c:43},
  {n:"Μοσχάρι κοκκινιστό",f:"200γρ Μοσχάρι, 200γρ Ρύζι (βρασμένο), Σαλάτα",k:786,p:59,l:31,c:67},
  {n:"Φακές με φέτα",f:"2 κούπες Φακές, 60γρ Φέτα, Σαλάτα (χωρίς ψωμί)",k:781,p:48,l:28,c:89},
  {n:"Μακαρόνια με κιμά",f:"100γρ Μακαρόνια (ωμά), 150γρ Κιμάς, 25γρ Τυρί, Σαλάτα",k:753,p:53,l:20,c:86},
  {n:"Κοτόπουλο γύρος",f:"200γρ Μπούτι, 1 Πίτα, Τζατζίκι, Ντομάτα, Πατάτες",k:794,p:61,l:29,c:69},
  {n:"Ψάρι ψητό",f:"300γρ Ψάρι, 250γρ Πατάτα, Σαλάτα",k:783,p:73,l:27,c:61},
- {n:"Μπριζόλα με πατάτες",f:"250γρ Μπριζόλα, 250γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:1030,p:81,l:42,c:76}
-];
-var DIN=[
+ {n:"Μπριζόλα με πατάτες",f:"250γρ Μπριζόλα, 250γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:1030,p:81,l:42,c:76},
+ {n:"Πένες με κοτόπουλο",f:"Πένες 100γρ (ωμές), Κοτόπουλο 150γρ, Σάλτσα ντομάτας, 25γρ Τυρί",k:795,p:68,l:18,c:86},
+ {n:"Μπιφτέκια με πατάτες",f:"200γρ Μπιφτέκια, 250γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:754,p:53,l:25,c:76},
+ {n:"Παστίτσιο",f:"Μερίδα 350γρ + Σαλάτα",k:782,p:33,l:45,c:63},
+ {n:"Wrap με μπιφτέκι",f:"2 Τορτίγιες, 150γρ Μπιφτέκια, Τζατζίκι, Λαχανικά",k:661,p:46,l:21,c:67},
  {n:"Αυγά με φέτα",f:"3 Αυγά, 50γρ Φέτα, Σαλάτα, 1 φ Ψωμί",k:554,p:34,l:36,c:25},
+ {n:"Βραστά αυγά με πατάτες και φέτα",f:"3 Αυγά βραστά, 50γρ Φέτα, 150γρ Πατάτες τηγανητές (ωμό βάρος)",k:560,p:29,l:37,c:29},
+ {n:"Τορτίγιες με κιμά και φέτα",f:"2 Τορτίγιες πρωτεΐνης Καραμολέγκος, 100γρ Κιμάς 5% (ωμός), 30γρ Φέτα, Κρεμμύδι, Ντομάτα",k:600,p:48,l:20,c:56},
  {n:"Γιαούρτι με καρύδια",f:"250γρ Γιαούρτι 5%, Μέλι, 20γρ Καρύδια, Φρούτο",k:497,p:25,l:26,c:45},
  {n:"Τοστ με γιαούρτι",f:"Τοστ Γαλοπούλα-Τυρί, 150γρ Γιαούρτι",k:471,p:39,l:18,c:36},
- {n:"Αυγά με φέτα",f:"3 Αυγά, 50γρ Φέτα, Σαλάτα, 1 φ Ψωμί",k:554,p:34,l:36,c:25},
  {n:"Σπανακόρυζο",f:"300γρ Σπανακόρυζο, 40γρ Φέτα, 150γρ Γιαούρτι",k:581,p:28,l:28,c:52},
- {n:"Ελεύθερο",f:"Ό,τι θες — κράτα την πρωτεΐνη ψηλά",k:512,p:31,l:18,c:57},
- {n:"Αραβική με κιμά",f:"1 Αραβική, 120γρ Κιμάς, 30γρ Τυρί",k:427,p:39,l:14,c:34}
+ {n:"Αραβική με κιμά",f:"1 Αραβική, 120γρ Κιμάς, 30γρ Τυρί",k:427,p:39,l:14,c:34},
+ {n:"Cottage",f:"200γρ Cottage με Μέλι, Καρύδια και Φρούτο",k:450,p:25,l:22,c:43},
+ {n:"Ελεύθερο",f:"Ό,τι θες — κράτα την πρωτεΐνη ψηλά",k:512,p:31,l:18,c:57}
 ];
 
-var VARS={
- b:[B,
-   {n:"Pancakes βρώμης",f:"Βρώμη 80γρ, Γάλα 150ml, Μπανάνα, 1 σκουπ Πρωτεΐνη, Μπέικιν, Μέλι",k:642,p:41,l:10,c:104},
-   {n:"Shake στο shaker",f:"1 σκουπ Πρωτεΐνη + 50γρ Βρώμη στο shaker από το βράδυ. Το πρωί 300ml Γάλα + Μπανάνα",k:560,p:42,l:10,c:78}],
- s:[S,
-   {n:"Ψωμί με μέλι",f:"2 φέτες Ψωμί με Μέλι, Μπανάνα, 10 Αμύγδαλα",k:395,p:12,l:9,c:73},
-   {n:"Φρυγανιές",f:"4 Φρυγανιές με Φυστικοβούτυρο + Φρούτο",k:358,p:10,l:13,c:53},
-   {n:"Κεφίρ πρωτεΐνης",f:"Μπουκάλι Κεφίρ πρωτεΐνης Όλυμπος",k:199,p:26,l:2,c:26}],
- m:[{n:"Πένες με κοτόπουλο",f:"Πένες 100γρ (ωμές), Κοτόπουλο 150γρ, Σάλτσα ντομάτας, 25γρ Τυρί",k:795,p:68,l:18,c:86},
-   {n:"Μπιφτέκια με πατάτες",f:"200γρ Μπιφτέκια, 250γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:754,p:53,l:25,c:76},
-   {n:"Παστίτσιο",f:"Μερίδα 350γρ + Σαλάτα",k:782,p:33,l:45,c:63},
-   {n:"Wrap με μπιφτέκι",f:"2 Τορτίγιες, 150γρ Μπιφτέκια, Τζατζίκι, Λαχανικά",k:661,p:46,l:21,c:67},
-   {n:"Κοτόπουλο με τηγανητές",f:"250γρ Μπούτι κοτόπουλο (ωμό), 250γρ Πατάτες τηγανητές (ωμό βάρος)",k:650,p:53,l:30,c:43}],
- d:[{n:"Αυγά με φέτα",f:"3 Αυγά, 50γρ Φέτα, Σαλάτα, 1 φ Ψωμί",k:554,p:34,l:36,c:25},
-   {n:"Γιαούρτι με καρύδια",f:"250γρ Γιαούρτι 5%, Μέλι, 20γρ Καρύδια, Φρούτο",k:497,p:25,l:26,c:45},
-   {n:"Τοστ με γιαούρτι",f:"Τοστ Γαλοπούλα-Τυρί, 150γρ Γιαούρτι",k:471,p:39,l:18,c:36},
-   {n:"Cottage",f:"200γρ Cottage με Μέλι, Καρύδια και Φρούτο",k:450,p:25,l:22,c:43}]}
-;
+/* το παλιό πρόγραμμα ανά μέρα — μόνο για να διαβάζονται σωστά οι μέρες που γράφτηκαν πριν την αλλαγή */
+var OLD_MAIN=["Κοτόπουλο με πατάτες","Μοσχάρι κοκκινιστό","Φακές με φέτα","Μακαρόνια με κιμά","Κοτόπουλο γύρος","Ψάρι ψητό","Μπριζόλα με πατάτες"];
+var OLD_DIN=["Αυγά με φέτα","Γιαούρτι με καρύδια","Τοστ με γιαούρτι","Αυγά με φέτα","Σπανακόρυζο","Ελεύθερο","Αραβική με κιμά"];
+function oldDef(slot,di){ return slot==="b"?"Γιαούρτι bowl":slot==="s"?"Μπάρα πρωτεΐνης":slot==="m"?OLD_MAIN[di]:OLD_DIN[di]; }
+
 var SHOP=[
  ["Κρέας & ψάρι",[
    ["s1","Κοτόπουλο στήθος","400γρ"],
@@ -685,6 +704,7 @@ var SHOP=[
    ["s22","Ψωμί ολικής ή τοστ","1 μικρό (~8 φέτες)"],
    ["s23","Πίτες σουβλακιού","1 πακέτο"],
    ["s24","Αραβική πίτα","1 πακέτο"],
+   ["s42","Τορτίγιες πρωτεΐνης Καραμολέγκος","1 πακέτο"],
    ["s25","Μακαρόνια","1 πακέτο"],
    ["s26","Ρύζι","1 πακέτο"],
    ["s39","Φρυγανιές","1 πακέτο"]]],
@@ -705,14 +725,11 @@ var SHOP=[
    ["s36","Κρεατίνη monohydrate","5γρ τη μέρα"]]]
 ];
 
-var SLOTN={b:"Πρωινό",s:"Σνακ",m:"Το καλό γεύμα",d:"Βραδινό"};
-var SLOTS=["b","s","m","d"];
-
 /* ---------- state ---------- */
-var db=null, today=iso(new Date()), state={meals:{},swaps:{}}, hist=[], view="today", openDay=-1, sheetSlot=null, bought={}, price={}, enterSlot=null;
-var custom={b:[],s:[],m:[],d:[]};
-var lastRest=null;
-var vday=today;      /* η μέρα που βλέπει/συμπληρώνει: σήμερα ή χθες */
+var db=null, today=iso(new Date()), state={log:[]}, hist=[], view="today", bought={}, price={};
+var custom=[];          /* δικά του φαγητά */
+var lastRest=null;      /* τελευταίες θερμίδες ηρεμίας που έβαλε — αλλάζουν λίγο από μέρα σε μέρα */
+var vday=today;         /* η μέρα που βλέπει/συμπληρώνει */
 function vdate(){ return new Date(vday+"T12:00:00"); }
 function vdi(){ return dow(vdate()); }
 function shiftDay(n){ var d=new Date(); d.setDate(d.getDate()+n); return iso(d); }
@@ -727,32 +744,65 @@ function dayTitle(){
   if(vday===shiftDay(1))return "Αύριο";
   return DAYS[vdi()];
 }
+
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function dow(d){return (d.getDay()+6)%7;}           /* Δευτέρα = 0 */
+function $(id){return document.getElementById(id);}
+function esc(s){var e=document.createElement("div");e.textContent=s;return e.innerHTML.replace(/"/g,"&quot;");}
+function fmt(n){ return Math.round(n).toLocaleString("el-GR"); }
+function norm(s){ return String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase(); }
+
+/* ---------- φαγητά ---------- */
+function allFoods(){ return custom.concat(FOODS); }
+function byName(n){ var l=allFoods(); for(var i=0;i<l.length;i++){ if(l[i].n===n)return l[i]; } return null; }
+function isMine(n){ for(var i=0;i<custom.length;i++){ if(custom[i].n===n)return true; } return false; }
+/* κρατάμε αντίγραφο των νούμερων, ώστε το ιστορικό να μην αλλάζει αν αλλάξει ή σβηστεί ένα φαγητό */
+function snap(f){ return {n:f.n,k:f.k,p:f.p,l:f.l,c:f.c}; }
+
+/* τι έφαγε μια μέρα· οι παλιές μέρες (πρωινό/σνακ/μεσημεριανό/βραδινό με τικ) μετατρέπονται εδώ */
+function logOf(r){
+  if(!r)return [];
+  if(Array.isArray(r.log))return r.log;
+  var out=[], meals=r.meals||{}, sw=r.swaps||{};
+  if(!r.date)return out;
+  var di=dow(new Date(r.date+"T12:00:00"));
+  ["b","s","m","d"].forEach(function(s){
+    var v=meals[s]; if(!v)return;
+    var f=byName(v===true?(sw[s]||oldDef(s,di)):v);
+    if(f)out.push(snap(f));
+  });
+  return out;
+}
+function totals(log){
+  var t={k:0,p:0,l:0,c:0,n:0};
+  (log||[]).forEach(function(m){ t.k+=m.k||0; t.p+=m.p||0; t.l+=m.l||0; t.c+=m.c||0; t.n++; });
+  return t;
+}
 function hasData(r){
   if(!r)return false;
   if(typeof r.weight==="number"||typeof r.waist==="number"||typeof r.burnA==="number")return true;
-  if(r.meals){ for(var k in r.meals){ if(r.meals[k])return true; } }
-  return false;
+  return logOf(r).length>0;
 }
+function curRow(){ return {date:vday,log:state.log,weight:state.weight,waist:state.waist,burnA:state.burnA,burnR:state.burnR}; }
+function restOf(r){ return typeof r==="number"?r:(typeof lastRest==="number"?lastRest:null); }
+
 /* ---------- ημερολόγιο μήνα ---------- */
 var MONTHS=["Ιανουάριος","Φεβρουάριος","Μάρτιος","Απρίλιος","Μάιος","Ιούνιος","Ιούλιος","Αύγουστος","Σεπτέμβριος","Οκτώβριος","Νοέμβριος","Δεκέμβριος"];
 var calY=new Date().getFullYear(), calM=new Date().getMonth();
-/* ok: όλα τα γεύματα τσεκαρισμένα και (αν έχει ρολόι) έλλειμμα · over: πλεόνασμα · part: κάτι γράφτηκε αλλά όχι όλα */
+/* ok: στον στόχο ή (αν έχει ρολόι) σε έλλειμμα · over: πλεόνασμα · part: πέρασε πολύ λίγα, μάλλον λείπουν φαγητά */
 function dayStatus(r){
   if(!hasData(r))return "none";
-  var nm=eatenOf(dow(new Date(r.date+"T12:00:00")),r.meals,r.swaps).n;
-  if(nm<4)return "part";
+  var t=totals(logOf(r));
+  if(t.k<GOAL.k*0.6)return "part";
   if(typeof r.burnA==="number"){
     var rr=restOf(r.burnR);
-    if(typeof rr==="number"){
-      var di=dow(new Date(r.date+"T12:00:00"));
-      return eatenOf(di,r.meals,r.swaps).k-(r.burnA+rr)<=0?"ok":"over";
-    }
+    if(typeof rr==="number")return t.k-(r.burnA+rr)<=0?"ok":"over";
   }
-  return "ok";
+  return t.k<=GOAL.k+100?"ok":"over";
 }
 function renderCal(){
   var byDate={}; hist.forEach(function(r){ byDate[r.date]=r; });
-  byDate[vday]={date:vday,meals:state.meals,swaps:state.swaps,weight:state.weight,waist:state.waist,burnA:state.burnA,burnR:state.burnR};
+  byDate[vday]=curRow();
   var first=new Date(calY,calM,1), days=new Date(calY,calM+1,0).getDate(), lead=dow(first);
   var html=DAYS_S.map(function(d){return '<div class="wd">'+d+'</div>';}).join("");
   for(var i=0;i<lead;i++)html+='<div></div>';
@@ -769,7 +819,7 @@ function renderCal(){
   var now=new Date();
   $("calNext").disabled=calY>now.getFullYear()||(calY===now.getFullYear()&&calM>=now.getMonth());
   $("calSum").innerHTML=
-    '<div><b style="color:var(--good)">'+cnt.ok+'</b><span>στο πλάνο</span></div>'+
+    '<div><b style="color:var(--good)">'+cnt.ok+'</b><span>στον στόχο</span></div>'+
     '<div><b style="color:var(--ochre)">'+cnt.over+'</b><span>πλεόνασμα</span></div>'+
     '<div><b>'+cnt.part+'</b><span>μισές</span></div>';
 }
@@ -782,121 +832,52 @@ $("calGrid").addEventListener("click",function(e){
 
 function renderStrip(){
   var byDate={}; hist.forEach(function(r){ byDate[r.date]=r; });
-  byDate[vday]={meals:state.meals,weight:state.weight,waist:state.waist,burnA:state.burnA};
+  byDate[vday]=curRow();
   $("daySeg").innerHTML=weekDates().map(function(d,i){
     var k=iso(d);
     return '<button data-date="'+k+'" class="'+(k===vday?"on ":"")+(k===today?"today ":"")+(hasData(byDate[k])?"has":"")+'"'+
       ' aria-label="'+DAYS[i]+'">'+
       '<span class="dn">'+DAYS_S[i]+'</span><span class="dd">'+d.getDate()+'</span><i class="dt"></i></button>';
   }).join("");
-}   /* τελευταίες θερμίδες ηρεμίας που έβαλε — αλλάζουν λίγο από μέρα σε μέρα */
-
-function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
-function dow(d){return (d.getDay()+6)%7;}           /* Δευτέρα = 0 */
-function $(id){return document.getElementById(id);}
-function esc(s){var e=document.createElement("div");e.textContent=s;return e.innerHTML;}
-
-function optsFor(di,slot){
-  var list=VARS[slot].slice();
-  var base=slot==="m"?MAIN[di]:slot==="d"?DIN[di]:null;
-  if(base){ var has=false; for(var i=0;i<list.length;i++){if(list[i].n===base.n){has=true;break;}} if(!has)list.unshift(base); }
-  var mine=custom[slot]||[];
-  for(var j=0;j<mine.length;j++)list.push(mine[j]);
-  return list;
-}
-function isMine(slot,name){
-  var mine=custom[slot]||[];
-  for(var i=0;i<mine.length;i++){ if(mine[i].n===name)return true; }
-  return false;
-}
-function defName(di,slot){ return slot==="b"?B.n:slot==="s"?S.n:(slot==="m"?MAIN[di].n:DIN[di].n); }
-function pickMeal(slot,name){
-  var di=vdi();
-  if(name===defName(di,slot))delete state.swaps[slot]; else state.swaps[slot]=name;
-}
-function cycleMeal(slot,dir){
-  var di=vdi(), list=optsFor(di,slot), cur=mealFor(di,slot), i=0;
-  for(var q=0;q<list.length;q++){ if(list[q].n===cur.n){i=q;break;} }
-  var j=(i+dir+list.length)%list.length;
-  pickMeal(slot,list[j].n);
-  enterSlot={slot:slot,dir:dir>0?"L":"R"};
-  upsertHist({meals:state.meals,swaps:state.swaps});
-  renderToday(); saveDay();
-}
-
-function mealFor(di,slot){ return mealForSw(di,slot,state.swaps); }
-function mealForSw(di,slot,swaps){
-  var sw=swaps&&swaps[slot];
-  if(sw){var list=optsFor(di,slot);for(var i=0;i<list.length;i++){if(list[i].n===sw)return list[i];}}
-  if(slot==="b")return B; if(slot==="s")return S;
-  return slot==="m"?MAIN[di]:DIN[di];
-}
-function dayTotal(di,useSwaps){
-  var t={k:0,p:0,l:0,c:0};
-  SLOTS.forEach(function(s){
-    var m=useSwaps?mealFor(di,s):(s==="b"?B:s==="s"?S:(s==="m"?MAIN[di]:DIN[di]));
-    t.k+=m.k;t.p+=m.p;t.l+=m.l;t.c+=m.c;
-  });
-  return t;
 }
 
 /* ---------- render: σήμερα ---------- */
 function renderToday(){
-  var d=vdate(), di=dow(d), weekend=di>5||di===5, times=TIMES[di>=5?1:0];
-  var eaten={k:0,p:0,l:0,c:0}, goal=dayTotal(di,true);
-  var html="";
-  SLOTS.forEach(function(slot,i){
-    var m=mealFor(di,slot), done=doneFor(state.meals,slot,m.n);
-    if(done){eaten.k+=m.k;eaten.p+=m.p;eaten.l+=m.l;eaten.c+=m.c;}
-    if(slot==="m"){
-      var t=TRAIN[di];
-      html+='<div class="train'+(t==="r"?" rest":"")+'">'+
-        '<div class="trow"><b>'+(t==="w"?"Βάρη":t==="l"?"Περπάτημα ή handstand":"Ρεπό")+'</b>'+
-        (t==="r"?"":'<span>'+(weekend?"—":"17:00–18:00")+'</span>')+'</div>'+
-        '<div class="burn">'+
-          burnField("burnA","Ενεργές",state.burnA,"0")+
-          burnField("burnR","Ηρεμίας",state.burnR,typeof lastRest==="number"?String(lastRest):"0")+
-        '</div>'+
-        '<div class="bhint">Από το Apple Watch, το βράδυ. Ενεργές: ο κόκκινος κύκλος. '+
-        'Ηρεμίας: Υγεία → Ενέργεια ηρεμίας (Resting Energy).</div>'+
-        '</div>';
-    }
-    var opts=optsFor(di,slot), idx=0;
-    for(var q=0;q<opts.length;q++){ if(opts[q].n===m.n){idx=q;break;} }
-    var ent=enterSlot&&enterSlot.slot===slot?(" enter"+enterSlot.dir):"";
-    html+='<div class="mealwrap">'+
-      '<div class="mealhint">'+
-        '<svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>'+
-        '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>'+
-      '</div>'+
-      '<div class="meal'+(done?" done":"")+ent+'" data-slot="'+slot+'">'+
-      '<button class="tick" aria-label="Τσέκαρε"><svg viewBox="0 0 24 24"><path d="M4 12l6 6L20 6"/></svg></button>'+
-      '<div class="mbody">'+
-        '<div class="mhead"><span class="mtime">'+times[i]+'</span><span class="mslot">'+SLOTN[slot]+'</span></div>'+
-        '<div class="mname">'+esc(m.n)+'</div>'+
-        '<div class="mfood">'+esc(m.f)+'</div>'+
-        '<div class="mnums"><b>'+m.k+'</b> kcal &nbsp;·&nbsp; Π '+m.p+' · Λ '+m.l+' · Υ '+m.c+'</div>'+
-        '<div class="dots">'+opts.map(function(_,z){return '<i class="'+(z===idx?"on":"")+'"></i>';}).join("")+
-          '<em>σύρε για αλλαγή</em></div>'+
-        '<button class="swap" data-swap="'+slot+'">Όλες οι επιλογές</button>'+
-      '</div></div></div>';
-  });
-  enterSlot=null;
-  $("todayList").innerHTML=html;
+  var d=vdate(), di=dow(d), weekend=di>=5, t=totals(state.log);
 
-  $("sEaten").textContent=eaten.k.toLocaleString("el-GR");
-  $("sGoal").textContent=goal.k.toLocaleString("el-GR");
-  var pct=Math.min(100,Math.round(eaten.k/goal.k*100));
-  $("sBar").style.width=pct+"%";
-  $("sLeft").textContent=eaten.k>=goal.k?"ολοκληρώθηκε":("απομένουν "+(goal.k-eaten.k).toLocaleString("el-GR"));
-  $("mP").textContent=eaten.p+"γρ"; $("mF").textContent=eaten.l+"γρ"; $("mC").textContent=eaten.c+"γρ";
+  var html=state.log.length?state.log.map(function(m,i){
+    return '<div class="lg"><div class="lgb"><div class="lgn">'+esc(m.n)+'</div>'+
+      '<div class="lgnums"><b>'+m.k+'</b> kcal &nbsp;·&nbsp; Π '+m.p+' · Λ '+m.l+' · Υ '+m.c+'</div></div>'+
+      '<button class="lgx" data-rm="'+i+'" aria-label="Αφαίρεση: '+esc(m.n)+'">'+
+      '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';
+  }).join(""):'<div class="empty">Δεν έχεις περάσει τίποτα '+(vday===today?"σήμερα":"αυτή τη μέρα")+'.</div>';
+  html+='<button class="addbtn addfood" data-add="1">+ Πρόσθεσε φαγητό</button>';
+  $("logList").innerHTML=html;
+
+  var tr=TRAIN[di];
+  $("trainBox").innerHTML='<div class="train'+(tr==="r"?" rest":"")+'">'+
+    '<div class="trow"><b>'+(tr==="w"?"Βάρη":tr==="l"?"Περπάτημα ή handstand":"Ρεπό")+'</b>'+
+    (tr==="r"?"":'<span>'+(weekend?"—":"17:00–18:00")+'</span>')+'</div>'+
+    '<div class="burn">'+
+      burnField("burnA","Ενεργές",state.burnA,"0")+
+      burnField("burnR","Ηρεμίας",state.burnR,typeof lastRest==="number"?String(lastRest):"0")+
+    '</div>'+
+    '<div class="bhint">Από το Apple Watch, το βράδυ. Ενεργές: ο κόκκινος κύκλος. '+
+    'Ηρεμίας: Υγεία → Ενέργεια ηρεμίας (Resting Energy).</div>'+
+    '</div>';
+
+  $("sEaten").textContent=fmt(t.k);
+  $("sGoal").textContent=fmt(GOAL.k);
+  $("sBar").style.width=Math.min(100,Math.round(t.k/GOAL.k*100))+"%";
+  $("sLeft").textContent=t.k>GOAL.k?(fmt(t.k-GOAL.k)+" πάνω από τον στόχο"):t.k===GOAL.k?"στον στόχο":("απομένουν "+fmt(GOAL.k-t.k));
+  $("mP").textContent=t.p+" / "+GOAL.p+"γρ"; $("mF").textContent=t.l+"γρ"; $("mC").textContent=t.c+"γρ";
   $("hSub").textContent=DAYS[di]+" · "+d.toLocaleDateString("el-GR",{day:"numeric",month:"short"});
   if(view==="today")$("hTitle").textContent=dayTitle();
   renderStrip();
   $("yNote").classList.toggle("hide",vday===today);
   $("yNote").textContent=vday<today
-    ? "Βλέπεις "+DAYS_ACC[di]+". Ό,τι συμπληρώσεις αποθηκεύεται σε αυτή τη μέρα."
-    : "Αυτό είναι το πρόγραμμα για "+DAYS_ACC[di]+".";
+    ? "Βλέπεις "+DAYS_ACC[di]+". Ό,τι περάσεις αποθηκεύεται σε αυτή τη μέρα."
+    : "Αυτή η μέρα δεν έχει έρθει ακόμα.";
   $("wLab").textContent=vday===today?"Πρωινό ζύγισμα":"Ζύγισμα · "+DAYS[di];
   renderBalance();
 }
@@ -907,17 +888,8 @@ function burnField(id,label,val,ph){
     '<input id="'+id+'" data-burn="'+id+'" type="number" min="0" step="1" inputmode="numeric" '+
     'placeholder="'+ph+'" value="'+(typeof val==="number"?val:"")+'"><span>kcal</span></div></div>';
 }
-function fmt(n){ return Math.round(n).toLocaleString("el-GR"); }
-/* το τικ κρατάει το όνομα του φαγητού: αν αλλάξεις φαγητό, το καινούριο δεν είναι τσεκαρισμένο */
-function doneFor(meals,slot,name){ var v=meals&&meals[slot]; return v===true||v===name; }
-function eatenOf(di,meals,swaps){
-  var k=0,n=0;
-  SLOTS.forEach(function(s){ var m=mealForSw(di,s,swaps); if(doneFor(meals,s,m.n)){ k+=m.k; n++; } });
-  return {k:k,n:n};
-}
-function restOf(r){ return typeof r==="number"?r:(typeof lastRest==="number"?lastRest:null); }
 function renderBalance(){
-  var di=vdi(), e=eatenOf(di,state.meals,state.swaps);
+  var e=totals(state.log);
   var a=state.burnA, r=restOf(state.burnR), el=$("balance");
   var head='<div class="lab">Ισοζύγιο ημέρας</div>';
   if(typeof a!=="number"){
@@ -938,12 +910,13 @@ function renderBalance(){
   else if(diff===0)verdict="Έφαγες ακριβώς όσα έκαψες.";
   else verdict="Έφαγες παραπάνω από όσα έκαψες. Μία μέρα δεν αλλάζει κάτι, μετράει η βδομάδα.";
   var restNote=typeof state.burnR==="number"?"":" · τελευταία τιμή";
+  var few=e.k<GOAL.k*0.6;
   el.innerHTML='<div class="bal '+cls+'">'+head+
-    '<div class="brow"><div>Έφαγες<small>'+e.n+' από 4 γεύματα τσεκαρισμένα</small></div><b>'+fmt(e.k)+' kcal</b></div>'+
+    '<div class="brow"><div>Έφαγες<small>'+e.n+' '+(e.n===1?"φαγητό":"φαγητά")+'</small></div><b>'+fmt(e.k)+' kcal</b></div>'+
     '<div class="brow"><div>Έκαψες<small>ηρεμίας '+fmt(r)+restNote+' + ενεργές '+fmt(a)+'</small></div><b>'+fmt(burned)+' kcal</b></div>'+
     '<div class="bres"><span>'+word+'</span><b>'+(diff>0?"+":diff<0?"−":"")+fmt(Math.abs(diff))+' kcal</b></div>'+
-    (e.n===4?'<div class="bnote">'+verdict+'</div>':'')+
-    (e.n<4?'<div class="bnote warn">Τσέκαρε όλα όσα έφαγες, αλλιώς το έλλειμμα βγαίνει μεγαλύτερο απ\' ό,τι είναι.</div>':'')+
+    (few?'<div class="bnote warn">Αν δεν έχεις περάσει όλα όσα έφαγες, το έλλειμμα βγαίνει μεγαλύτερο απ\' ό,τι είναι.</div>'
+        :'<div class="bnote">'+verdict+'</div>')+
     '<div class="bnote">Το ρολόι συνήθως λέει λίγο παραπάνω ενεργές θερμίδες από τις πραγματικές. '+
     'Εμπιστέψου τον μέσο όρο της βδομάδας και τη ζυγαριά, όχι τη μία μέρα.</div>'+
     '</div>';
@@ -954,37 +927,15 @@ function weekBalance(){
   function add(row){
     if(typeof row.burnA!=="number")return;
     var r=restOf(row.burnR); if(typeof r!=="number")return;
-    var di=dow(new Date(row.date+"T12:00:00"));
-    sum+=eatenOf(di,row.meals,row.swaps).k-(row.burnA+r); n++;
+    sum+=totals(logOf(row)).k-(row.burnA+r); n++;
   }
   hist.forEach(function(row){
     if(row.date===vday)return;
     if(row.date>=a&&row.date<=today)add(row);
   });
-  if(vday>=a&&vday<=today)add({date:vday,meals:state.meals,swaps:state.swaps,burnA:state.burnA,burnR:state.burnR});
+  if(vday>=a&&vday<=today)add(curRow());
   return n?{avg:sum/n,n:n}:null;
 }
-
-/* ---------- render: εβδομάδα ---------- */
-function renderWeek(){
-  var ti=dow(new Date()), html="";
-  for(var i=0;i<7;i++){
-    var t=dayTotal(i,false), tr=TRAIN[i];
-    var chip=tr==="w"?'<span class="dchip c-w">Βάρη</span>':tr==="l"?'<span class="dchip c-w">Ελαφρύ</span>':'<span class="dchip c-r">Ρεπό</span>';
-    html+='<div class="day'+(i===ti?" today":"")+'" data-day="'+i+'">'+
-      '<div class="drow"><div class="dname">'+DAYS[i]+chip+'</div>'+
-      '<div class="dnums"><b>'+t.k.toLocaleString("el-GR")+'</b> kcal</div></div>'+
-      '<div class="dmeals">'+(openDay===i
-        ? SLOTS.map(function(s){var m=s==="b"?B:s==="s"?S:(s==="m"?MAIN[i]:DIN[i]);
-            return '<div style="margin-top:6px"><b style="color:var(--ink)">'+esc(m.n)+'</b><br>'+esc(m.f)+'</div>';}).join("")
-        : esc(MAIN[i].n+" · "+DIN[i].n))+'</div>'+
-      (openDay===i?'<div class="dnums" style="margin-top:8px">Π '+t.p+'γρ · Λ '+t.l+'γρ · Υ '+t.c+'γρ</div>'+
-        '<button class="swap" style="margin-top:9px" data-open="'+i+'">Άνοιξε '+DAYS_ACC[i]+'</button>':'')+
-      '</div>';
-  }
-  $("weekList").innerHTML=html;
-}
-
 
 /* ---------- render: ψώνια ---------- */
 function renderShop(){
@@ -1097,7 +1048,7 @@ var store={
   }
 };
 function saveDay(){
-  var body={date:vday,meals:state.meals,swaps:state.swaps};
+  var body={date:vday,log:state.log};
   if(typeof state.weight==="number")body.weight=state.weight;
   if(typeof state.waist==="number")body.waist=state.waist;
   if(typeof state.burnA==="number")body.burnA=state.burnA;
@@ -1105,17 +1056,23 @@ function saveDay(){
   return store.setDay(vday,body);
 }
 function saveShop(){ return store.set("shop",{bought:bought,price:price}); }
+function saveCustom(){ return store.set("custom",{list:custom}); }
 function flash(t){ var e=$("saveMsg"); e.textContent=t; setTimeout(function(){e.textContent="";},2200); }
+function upsertHist(patch){
+  var row=null;
+  for(var i=0;i<hist.length;i++){ if(hist[i].date===vday){row=hist[i];break;} }
+  if(!row){ row={date:vday}; hist.push(row); hist.sort(function(a,b){return a.date<b.date?-1:1;}); }
+  Object.keys(patch).forEach(function(k){ row[k]=patch[k]; });
+}
 
 /* ---------- events ---------- */
 function go(v){
   view=v;
   document.querySelectorAll(".tab").forEach(function(x){x.classList.toggle("on",x.dataset.v===v);});
   $("shopBtn").classList.toggle("on",v==="shop");
-  ["today","week","shop","prog"].forEach(function(k){ $("v-"+k).classList.toggle("hide",k!==v); });
-  $("hTitle").textContent={today:dayTitle(),week:"Η εβδομάδα",shop:"Ψώνια",prog:"Πρόοδος"}[v];
+  ["today","shop","prog"].forEach(function(k){ $("v-"+k).classList.toggle("hide",k!==v); });
+  $("hTitle").textContent={today:dayTitle(),shop:"Ψώνια",prog:"Πρόοδος"}[v];
   if(v==="today"){renderToday();}else{$("hSub").textContent="";}
-  if(v==="week")renderWeek();
   if(v==="shop")renderShop();
   if(v==="prog")renderProg();
   window.scrollTo(0,0);
@@ -1124,77 +1081,32 @@ document.querySelectorAll(".tab").forEach(function(b){
   b.addEventListener("click",function(){ go(b.dataset.v); });
 });
 
-$("todayList").addEventListener("click",function(e){
-  var sw=e.target.closest("[data-swap]");
-  if(sw){ openSheet(sw.dataset.swap); return; }
-  var card=e.target.closest(".meal"); if(!card)return;
-  var slot=card.dataset.slot;
-  var nm=mealFor(vdi(),slot).n;
-  if(doneFor(state.meals,slot,nm))delete state.meals[slot]; else state.meals[slot]=nm;
-  upsertHist({meals:state.meals,swaps:state.swaps});
+function addFood(f){
+  if(!f)return;
+  state.log.push(snap(f));
+  upsertHist({log:state.log});
+  closeSheet(); renderToday(); saveDay();
+}
+$("logList").addEventListener("click",function(e){
+  if(e.target.closest("[data-add]")){ openSheet(); return; }
+  var x=e.target.closest("[data-rm]"); if(!x)return;
+  state.log.splice(+x.dataset.rm,1);
+  upsertHist({log:state.log});
   renderToday(); saveDay();
 });
 
-$("todayList").addEventListener("input",function(e){
+$("trainBox").addEventListener("input",function(e){
   var f=e.target.closest("[data-burn]"); if(!f)return;
   var k=f.dataset.burn, v=parseFloat(f.value);
   if(isNaN(v)||v<0||v>9999)delete state[k]; else state[k]=Math.round(v);
-  renderBalance();   /* χωρίς redraw της λίστας, για να μη χαθεί το πληκτρολόγιο */
+  renderBalance();   /* χωρίς redraw της λωρίδας, για να μη χαθεί το πληκτρολόγιο */
 });
-$("todayList").addEventListener("change",function(e){
+$("trainBox").addEventListener("change",function(e){
   if(!e.target.closest("[data-burn]"))return;
   if(typeof state.burnR==="number"&&state.burnR!==lastRest){ lastRest=state.burnR; store.set("burn",{rest:lastRest}); }
-  upsertHist({burnA:state.burnA,burnR:state.burnR,meals:state.meals,swaps:state.swaps});
+  upsertHist({burnA:state.burnA,burnR:state.burnR,log:state.log});
   saveDay(); renderStrip();
 });
-
-/* ---------- swipe στις κάρτες των γευμάτων ---------- */
-(function(){
-  var card=null, slot=null, x0=0, y0=0, dx=0, axis=null, moved=false;
-  var list=$("todayList");
-
-  function start(e){
-    if(e.target.closest(".swap")||e.target.closest(".tick"))return;
-    var c=e.target.closest(".meal"); if(!c)return;
-    card=c; slot=c.dataset.slot; x0=e.clientX; y0=e.clientY; dx=0; axis=null; moved=false;
-    card.classList.add("dragging");
-  }
-  function move(e){
-    if(!card)return;
-    var mx=e.clientX-x0, my=e.clientY-y0;
-    if(!axis){
-      if(Math.abs(mx)<8&&Math.abs(my)<8)return;
-      axis=Math.abs(mx)>Math.abs(my)?"x":"y";
-      if(axis==="y"){ end(); return; }
-    }
-    if(axis!=="x")return;
-    moved=true; dx=mx;
-    var r=Math.max(-140,Math.min(140,dx));
-    card.style.transform="translateX("+r+"px)";
-    card.style.opacity=String(1-Math.min(.45,Math.abs(r)/320));
-  }
-  function end(){
-    if(!card)return;
-    var c=card, sl=slot, d=dx, was=moved;
-    card=null; slot=null; axis=null;
-    c.classList.remove("dragging");
-    c.style.transform=""; c.style.opacity="";
-    if(was&&Math.abs(d)>62){
-      var dir=d<0?1:-1;
-      c.style.transform="translateX("+(d<0?-110:110)+"%)";
-      c.style.opacity="0";
-      setTimeout(function(){ cycleMeal(sl,dir); },150);
-    }
-    if(was)setTimeout(function(){moved=false;},0);
-  }
-
-  list.addEventListener("pointerdown",start);
-  list.addEventListener("pointermove",move);
-  list.addEventListener("pointerup",end);
-  list.addEventListener("pointercancel",end);
-  list.addEventListener("pointerleave",end);
-  list.addEventListener("click",function(e){ if(moved){e.stopPropagation();e.preventDefault();moved=false;} },true);
-})();
 
 $("shopList").addEventListener("click",function(e){
   if(e.target.closest(".iprice"))return;
@@ -1220,83 +1132,85 @@ $("shopReset").addEventListener("click",function(){
   bought={}; renderShop(); saveShop();
 });
 
-$("weekList").addEventListener("click",function(e){
-  var o=e.target.closest("[data-open]");
-  if(o){ loadDay(iso(weekDates()[+o.dataset.open])); go("today"); return; }
-  var d=e.target.closest("[data-day]"); if(!d)return;
-  var i=+d.dataset.day; openDay=(openDay===i?-1:i); renderWeek();
-});
-
+/* ---------- λίστα φαγητών ---------- */
+function freq(){   /* πόσες φορές έχει περάσει κάθε φαγητό */
+  var c={};
+  hist.forEach(function(r){ if(r.date===vday)return; logOf(r).forEach(function(m){ c[m.n]=(c[m.n]||0)+1; }); });
+  state.log.forEach(function(m){ c[m.n]=(c[m.n]||0)+1; });
+  return c;
+}
+function optHtml(m){
+  var mine=isMine(m.n);
+  return '<button class="opt'+(mine?" own":"")+'" data-n="'+esc(m.n)+'">'+
+    '<b>'+esc(m.n)+(mine?' <span class="mine">δικό σου</span>':'')+'</b>'+
+    '<span>'+esc(m.f||"")+'</span>'+
+    '<span class="n">'+m.k+' kcal · Π '+m.p+' · Λ '+m.l+' · Υ '+m.c+'</span>'+
+    (mine?'<span class="del" data-del="'+esc(m.n)+'" role="button" aria-label="Διαγραφή">'+
+      '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span>':'')+
+    '</button>';
+}
 function renderSheetOpts(){
-  var slot=sheetSlot, di=vdi(), cur=mealFor(di,slot), list=optsFor(di,slot);
-  $("sheetOpts").innerHTML=list.map(function(m){
-    var mine=isMine(slot,m.n);
-    return '<button class="opt'+(m.n===cur.n?" sel":"")+(mine?" own":"")+'" data-n="'+esc(m.n)+'">'+
-      '<b>'+esc(m.n)+(mine?' <span class="mine">δικό σου</span>':'')+'</b>'+
-      '<span>'+esc(m.f)+'</span>'+
-      '<span class="n">'+m.k+' kcal · Π '+m.p+' · Λ '+m.l+' · Υ '+m.c+'</span>'+
-      (mine?'<span class="del" data-del="'+esc(m.n)+'" role="button" aria-label="Διαγραφή">'+
-        '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span>':'')+
-      '</button>';
-  }).join("");
+  var q=norm($("fSearch").value.trim()), list=allFoods(), html="";
+  if(q){
+    var hits=list.filter(function(m){ return norm(m.n+" "+(m.f||"")).indexOf(q)>=0; });
+    html=hits.length?hits.map(optHtml).join(""):'<div class="empty">Δεν βρέθηκε. Πρόσθεσέ το ως δικό σου φαγητό.</div>';
+  }else{
+    var c=freq();
+    var top=list.filter(function(m){return c[m.n];}).sort(function(a,b){return c[b.n]-c[a.n];}).slice(0,5);
+    if(top.length)html+='<div class="sgroup">Συχνά</div>'+top.map(optHtml).join("")+'<div class="sgroup" style="margin-top:14px">Όλα</div>';
+    html+=list.slice().sort(function(a,b){return a.n.localeCompare(b.n,"el");}).map(optHtml).join("");
+  }
+  $("sheetOpts").innerHTML=html;
 }
 function showSheetList(){
-  $("sheetOpts").classList.remove("hide");
-  $("sheetAdd").classList.remove("hide");
+  $("sheetList").classList.remove("hide");
   $("sheetForm").classList.add("hide");
-  $("sheetSub").textContent="Διάλεξε τι θα φας σήμερα. Τα σύνολα ενημερώνονται.";
+  $("sheetTitle").textContent="Τι έφαγες;";
+  $("sheetSub").textContent=vday===today?"Πάτα ένα φαγητό για να μπει στη μέρα σου.":"Μπαίνει "+DAYS_ACC[vdi()]+".";
 }
-function openSheet(slot){
-  sheetSlot=slot;
-  $("sheetTitle").textContent=SLOTN[slot];
+function openSheet(){
+  $("fSearch").value="";
   renderSheetOpts();
   showSheetList();
+  $("sheet").scrollTop=0;
   $("scrim").classList.add("on"); $("sheet").classList.add("on");
 }
 function closeSheet(){ $("scrim").classList.remove("on"); $("sheet").classList.remove("on"); }
 $("scrim").addEventListener("click",closeSheet);
+$("fSearch").addEventListener("input",renderSheetOpts);
 $("sheetOpts").addEventListener("click",function(e){
   var x=e.target.closest("[data-del]");
-  if(x){ e.stopPropagation(); delMine(sheetSlot,x.dataset.del); return; }
+  if(x){ e.stopPropagation(); delMine(x.dataset.del); return; }
   var o=e.target.closest("[data-n]"); if(!o)return;
-  pickMeal(sheetSlot,o.dataset.n);
-  closeSheet(); renderToday(); saveDay();
+  addFood(byName(o.dataset.n));
 });
 
 /* ---------- δικά του φαγητά ---------- */
-function saveCustom(){ return store.set("custom",custom); }
-function delMine(slot,name){
-  var mine=custom[slot]||[];
-  for(var i=0;i<mine.length;i++){ if(mine[i].n===name){ mine.splice(i,1); break; } }
-  if(state.swaps[slot]===name)delete state.swaps[slot];
-  saveCustom(); saveDay();
-  renderSheetOpts(); renderToday(); renderWeek();
+function delMine(name){
+  for(var i=0;i<custom.length;i++){ if(custom[i].n===name){ custom.splice(i,1); break; } }
+  saveCustom(); renderSheetOpts();   /* ό,τι έχει ήδη περάσει στις μέρες μένει όπως ήταν */
 }
 $("sheetAdd").addEventListener("click",function(){
   ["fName","fDesc","fK","fP","fL","fC"].forEach(function(id){ $(id).value=""; });
-  $("sheetOpts").classList.add("hide");
-  $("sheetAdd").classList.add("hide");
+  $("sheetList").classList.add("hide");
   $("sheetForm").classList.remove("hide");
-  $("sheetSub").textContent="Γράψε το φαγητό σου. Θα μπαίνει στις παραλλαγές του "+SLOTN[sheetSlot].toLowerCase()+".";
+  $("sheetTitle").textContent="Δικό μου φαγητό";
+  $("sheetSub").textContent="Θα μπει στη μέρα σου και θα μείνει στη λίστα για την επόμενη φορά.";
   $("fName").focus();
 });
 $("fCancel").addEventListener("click",showSheetList);
 $("fSave").addEventListener("click",function(){
-  var slot=sheetSlot;
   var n=$("fName").value.trim();
-  if(!n){ flash("Βάλε ένα όνομα στο φαγητό."); $("fName").focus(); return; }
-  var di=vdi(), list=optsFor(di,slot);
-  for(var i=0;i<list.length;i++){ if(list[i].n===n){ flash("Υπάρχει ήδη φαγητό με αυτό το όνομα."); return; } }
+  if(!n){ $("fName").focus(); return; }
+  if(byName(n)){ $("sheetSub").textContent="Υπάρχει ήδη φαγητό με αυτό το όνομα."; $("fName").focus(); return; }
   function num(id){ var v=parseFloat($(id).value); return isNaN(v)||v<0?0:Math.round(v); }
   var p=num("fP"), l=num("fL"), c=num("fC"), k=num("fK");
   if(!k)k=Math.round(p*4+l*9+c*4);
-  if(!k&&!p&&!l&&!c){ flash("Βάλε θερμίδες ή μακροθρεπτικά."); $("fK").focus(); return; }
-  var f=$("fDesc").value.trim()||"Δικό σου φαγητό";
-  custom[slot].push({n:n,f:f,k:k,p:p,l:l,c:c});
-  pickMeal(slot,n);
-  saveCustom(); saveDay();
-  closeSheet(); renderToday(); renderWeek();
-  flash("Μπήκε στο "+SLOTN[slot].toLowerCase()+".");
+  if(!k&&!p&&!l&&!c){ $("sheetSub").textContent="Βάλε θερμίδες ή μακροθρεπτικά."; $("fK").focus(); return; }
+  var f={n:n,f:$("fDesc").value.trim()||"Δικό σου φαγητό",k:k,p:p,l:l,c:c};
+  custom.push(f);
+  saveCustom();
+  addFood(f);
 });
 
 $("wSave").addEventListener("click",function(){
@@ -1309,26 +1223,18 @@ $("cSave").addEventListener("click",function(){
   state.waist=v; upsertHist({waist:v});
   saveDay().then(function(){ flash("Η μέση αποθηκεύτηκε: "+v+" εκ."); renderProg(); renderStrip(); });
 });
-function upsertHist(patch){
-  var row=null;
-  for(var i=0;i<hist.length;i++){ if(hist[i].date===vday){row=hist[i];break;} }
-  if(!row){ row={date:vday}; hist.push(row); hist.sort(function(a,b){return a.date<b.date?-1:1;}); }
-  Object.keys(patch).forEach(function(k){ row[k]=patch[k]; });
-}
 
 /* ---------- boot ---------- */
-renderToday(); renderWeek(); renderShop(); renderProg();
+renderToday(); renderShop(); renderProg();
 
 function loadDay(date){
-  vday=date; state={meals:{},swaps:{}};
+  vday=date; state={log:[]};
   $("wIn").value=""; $("cIn").value=""; $("saveMsg").textContent="";
   renderToday();
-  store.getDay(date).then(function(d){
+  return store.getDay(date).then(function(d){
     if(vday!==date)return;          /* άλλαξε μέρα όσο φόρτωνε */
     if(d){
-      state.meals=d.meals||{}; state.swaps=d.swaps||{};
-      /* παλιά τικ (true) → όνομα του φαγητού που ήταν επιλεγμένο */
-      SLOTS.forEach(function(sl){ if(state.meals[sl]===true)state.meals[sl]=mealFor(vdi(),sl).n; });
+      state.log=logOf(d).slice();
       if(typeof d.weight==="number"){state.weight=d.weight;$("wIn").value=d.weight;}
       if(typeof d.waist==="number"){state.waist=d.waist;$("cIn").value=d.waist;}
       if(typeof d.burnA==="number")state.burnA=d.burnA;
@@ -1343,13 +1249,20 @@ $("daySeg").addEventListener("click",function(e){
 });
 
 function hydrate(){
-  loadDay(today);
   store.get("shop").then(function(d){ if(d){ bought=d.bought||{}; price=d.price||{}; renderShop(); } });
   store.get("burn").then(function(d){ if(d&&typeof d.rest==="number"){ lastRest=d.rest; renderToday(); renderProg(); } });
+  /* πρώτα τα δικά του φαγητά, για να διαβαστούν σωστά οι παλιές μέρες */
   store.get("custom").then(function(d){
-    if(d){ SLOTS.forEach(function(k){ if(Array.isArray(d[k]))custom[k]=d[k]; }); renderToday(); renderWeek(); }
-  });
-  store.days().then(function(rows){
+    if(d){
+      if(Array.isArray(d.list))custom=d.list;
+      else ["b","s","m","d"].forEach(function(k){
+        if(Array.isArray(d[k]))d[k].forEach(function(m){ if(m&&m.n&&!isMine(m.n))custom.push(m); });
+      });
+    }
+  }).then(function(){
+    loadDay(today);
+    return store.days();
+  }).then(function(rows){
     hist=rows.filter(function(r){return r&&r.date;}).sort(function(a,b){return a.date<b.date?-1:1;});
     renderProg(); renderStrip();
   });
