@@ -450,14 +450,18 @@
   .foot{font-size:11.5px;color:var(--muted);margin:22px 0 0;line-height:1.5}
   .ok{font-size:12.5px;color:var(--good);font-weight:600;margin-top:6px;min-height:16px}
 
-  /* ημερολόγιο φαγητών */
-  .lg{
-    display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
-    border-radius:12px;padding:10px 6px 10px 14px;margin-bottom:7px;box-shadow:var(--shadow);
+  /* γεύματα της μέρας */
+  .slot{background:var(--card);border:1px solid var(--line);border-radius:13px;margin-bottom:9px;box-shadow:var(--shadow);overflow:hidden}
+  .shead{
+    display:flex;align-items:baseline;justify-content:space-between;gap:10px;width:100%;
+    background:none;border:0;padding:12px 14px 10px;cursor:pointer;color:var(--ink);text-align:left;font:inherit;
   }
+  .shead b{font-family:"Alegreya",Georgia,serif;font-weight:700;font-size:17px}
+  .shead span{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted)}
+  .sitem{display:flex;align-items:center;gap:8px;padding:8px 6px 8px 14px;border-top:1px solid var(--line2)}
   .lgb{flex:1;min-width:0}
-  .lgn{font-weight:600;font-size:15px;line-height:1.3}
-  .lgnums{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);margin-top:3px}
+  .lgn{font-weight:600;font-size:14.5px;line-height:1.3}
+  .lgnums{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted);margin-top:2px}
   .lgnums b{color:var(--ink);font-weight:600}
   .lgx{
     flex:none;width:36px;height:36px;border-radius:10px;border:0;background:transparent;
@@ -465,14 +469,26 @@
   }
   .lgx:active{background:var(--card2)}
   .lgx svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round}
+  .sadd{
+    display:block;width:100%;border:0;border-top:1px solid var(--line2);background:transparent;
+    padding:11px 14px;text-align:left;cursor:pointer;
+    font-family:"Commissioner",sans-serif;font-size:14px;font-weight:600;color:var(--ochre);
+  }
+  .sadd:active,.shead:active{background:var(--card2)}
   .empty{font-size:13.5px;color:var(--muted);padding:6px 2px 10px}
-  .addfood{margin:2px 0 0;color:var(--ink);border-color:color-mix(in srgb,var(--muted) 55%,transparent)}
   .search{
     width:100%;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:11px;
     padding:11px 13px;font-family:"Commissioner",sans-serif;font-size:16px;margin-bottom:12px;
   }
   .search:focus{outline:2px solid var(--dark);outline-offset:1px}
-  .sgroup{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:4px 0 7px}
+  .sgroup{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 7px}
+  .sgroup:first-child{margin-top:2px}
+  /* πιο μικρές κάρτες στη λίστα, για λιγότερο σκρολ */
+  #sheetOpts .opt{padding:9px 13px;margin-bottom:6px}
+  #sheetOpts .opt b{font-size:14.5px;margin-bottom:1px}
+  #sheetOpts .opt>span:not(.n):not(.del){display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+  #sheetOpts .opt .n{margin-top:3px}
+  #sheetOpts .opt .del{top:7px;right:8px}
 </style>
 </head>
 <body>
@@ -522,8 +538,7 @@
         <div class="macro"><b id="mC">0γρ</b><span>υδατ.</span></div>
       </div>
     </div>
-    <div class="eyebrow">Τι έφαγες</div>
-    <div id="logList"></div>
+    <div id="logList" style="margin-top:14px"></div>
     <div id="trainBox"></div>
     <div id="balance"></div>
   </section>
@@ -635,38 +650,41 @@ var DAYS=["Δευτέρα","Τρίτη","Τετάρτη","Πέμπτη","Παρ�
 var DAYS_S=["Δε","Τρ","Τε","Πε","Πα","Σα","Κυ"];
 var DAYS_ACC=["τη Δευτέρα","την Τρίτη","την Τετάρτη","την Πέμπτη","την Παρασκευή","το Σάββατο","την Κυριακή"];
 var TRAIN=["w","l","w","l","w","r","r"];
-var GOAL={k:2000,p:155};   /* recomposition: ~200 kcal κάτω από τη συντήρηση, ~2γρ/κιλό πρωτεΐνη */
+var GOAL={k:2000,p:155};
+var SLOTS=["b","m","s","d"];
+var SLOTN={b:"Πρωινό",m:"Μεσημεριανό",s:"Σνακ",d:"Βραδινό"};
+var SLOTA={b:"στο πρωινό",m:"στο μεσημεριανό",s:"στο σνακ",d:"στο βραδινό"};   /* recomposition: ~200 kcal κάτω από τη συντήρηση, ~2γρ/κιλό πρωτεΐνη */
 
-/* όλα τα φαγητά σε μία λίστα — διαλέγεις ό,τι έφαγες */
+/* όλα τα φαγητά · t: σε ποιο γεύμα ταιριάζει συνήθως (μόνο για τη σειρά στη λίστα, μπαίνει παντού) */
 var FOODS=[
- {n:"Γιαούρτι bowl",f:"Γιαούρτι 5% 250γρ, Βρώμη 50γρ, 10 Αμύγδαλα, Μπανάνα, ½ κ.σ. Μέλι, ½ σκουπ Πρωτεΐνη",k:680,p:44,l:23,c:78},
- {n:"Pancakes βρώμης",f:"Βρώμη 80γρ, Γάλα 150ml, Μπανάνα, 1 σκουπ Πρωτεΐνη, Μπέικιν, Μέλι",k:642,p:41,l:10,c:104},
- {n:"Shake στο shaker",f:"1 σκουπ Πρωτεΐνη + 50γρ Βρώμη στο shaker από το βράδυ. Το πρωί 300ml Γάλα + Μπανάνα",k:560,p:42,l:10,c:78},
- {n:"Μπάρα πρωτεΐνης",f:"Μπάρα πρωτεΐνης + Φρούτο",k:280,p:20,l:7,c:40},
- {n:"Ψωμί με μέλι",f:"2 φέτες Ψωμί με Μέλι, Μπανάνα, 10 Αμύγδαλα",k:395,p:12,l:9,c:73},
- {n:"Φρυγανιές",f:"4 Φρυγανιές με Φυστικοβούτυρο + Φρούτο",k:358,p:10,l:13,c:53},
- {n:"Κεφίρ πρωτεΐνης",f:"Μπουκάλι Κεφίρ πρωτεΐνης Όλυμπος",k:199,p:26,l:2,c:26},
- {n:"Κοτόπουλο με πατάτες",f:"200γρ Κοτόπουλο, 250γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:810,p:73,l:22,c:76},
- {n:"Κοτόπουλο με τηγανητές",f:"250γρ Μπούτι κοτόπουλο (ωμό), 250γρ Πατάτες τηγανητές (ωμό βάρος)",k:650,p:53,l:30,c:43},
- {n:"Μοσχάρι κοκκινιστό",f:"200γρ Μοσχάρι, 200γρ Ρύζι (βρασμένο), Σαλάτα",k:786,p:59,l:31,c:67},
- {n:"Φακές με φέτα",f:"2 κούπες Φακές, 60γρ Φέτα, Σαλάτα (χωρίς ψωμί)",k:781,p:48,l:28,c:89},
- {n:"Μακαρόνια με κιμά",f:"100γρ Μακαρόνια (ωμά), 150γρ Κιμάς, 25γρ Τυρί, Σαλάτα",k:753,p:53,l:20,c:86},
- {n:"Κοτόπουλο γύρος",f:"200γρ Μπούτι, 1 Πίτα, Τζατζίκι, Ντομάτα, Πατάτες",k:794,p:61,l:29,c:69},
- {n:"Ψάρι ψητό",f:"300γρ Ψάρι, 250γρ Πατάτα, Σαλάτα",k:783,p:73,l:27,c:61},
- {n:"Μπριζόλα με πατάτες",f:"250γρ Μπριζόλα, 250γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:1030,p:81,l:42,c:76},
- {n:"Πένες με κοτόπουλο",f:"Πένες 100γρ (ωμές), Κοτόπουλο 150γρ, Σάλτσα ντομάτας, 25γρ Τυρί",k:795,p:68,l:18,c:86},
- {n:"Μπιφτέκια με πατάτες",f:"200γρ Μπιφτέκια, 250γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:754,p:53,l:25,c:76},
- {n:"Παστίτσιο",f:"Μερίδα 350γρ + Σαλάτα",k:782,p:33,l:45,c:63},
- {n:"Wrap με μπιφτέκι",f:"2 Τορτίγιες, 150γρ Μπιφτέκια, Τζατζίκι, Λαχανικά",k:661,p:46,l:21,c:67},
- {n:"Αυγά με φέτα",f:"3 Αυγά, 50γρ Φέτα, Σαλάτα, 1 φ Ψωμί",k:554,p:34,l:36,c:25},
- {n:"Βραστά αυγά με πατάτες και φέτα",f:"3 Αυγά βραστά, 50γρ Φέτα, 150γρ Πατάτες τηγανητές (ωμό βάρος)",k:560,p:29,l:37,c:29},
- {n:"Τορτίγιες με κιμά και φέτα",f:"2 Τορτίγιες πρωτεΐνης Καραμολέγκος, 100γρ Κιμάς 5% (ωμός), 30γρ Φέτα, Κρεμμύδι, Ντομάτα",k:600,p:48,l:20,c:56},
- {n:"Γιαούρτι με καρύδια",f:"250γρ Γιαούρτι 5%, Μέλι, 20γρ Καρύδια, Φρούτο",k:497,p:25,l:26,c:45},
- {n:"Τοστ με γιαούρτι",f:"Τοστ Γαλοπούλα-Τυρί, 150γρ Γιαούρτι",k:471,p:39,l:18,c:36},
- {n:"Σπανακόρυζο",f:"300γρ Σπανακόρυζο, 40γρ Φέτα, 150γρ Γιαούρτι",k:581,p:28,l:28,c:52},
- {n:"Αραβική με κιμά",f:"1 Αραβική, 120γρ Κιμάς, 30γρ Τυρί",k:427,p:39,l:14,c:34},
- {n:"Cottage",f:"200γρ Cottage με Μέλι, Καρύδια και Φρούτο",k:450,p:25,l:22,c:43},
- {n:"Ελεύθερο",f:"Ό,τι θες — κράτα την πρωτεΐνη ψηλά",k:512,p:31,l:18,c:57}
+ {n:"Γιαούρτι bowl",f:"Γιαούρτι 5% 250γρ, Βρώμη 50γρ, 10 Αμύγδαλα, Μπανάνα, ½ κ.σ. Μέλι, ½ σκουπ Πρωτεΐνη",k:680,p:44,l:23,c:78,t:"b"},
+ {n:"Pancakes βρώμης",f:"Βρώμη 80γρ, Γάλα 150ml, Μπανάνα, 1 σκουπ Πρωτεΐνη, Μπέικιν, Μέλι",k:642,p:41,l:10,c:104,t:"b"},
+ {n:"Shake στο shaker",f:"1 σκουπ Πρωτεΐνη + 50γρ Βρώμη στο shaker από το βράδυ. Το πρωί 300ml Γάλα + Μπανάνα",k:560,p:42,l:10,c:78,t:"b"},
+ {n:"Μπάρα πρωτεΐνης",f:"Μπάρα πρωτεΐνης + Φρούτο",k:280,p:20,l:7,c:40,t:"s"},
+ {n:"Ψωμί με μέλι",f:"2 φέτες Ψωμί με Μέλι, Μπανάνα, 10 Αμύγδαλα",k:395,p:12,l:9,c:73,t:"s"},
+ {n:"Φρυγανιές",f:"4 Φρυγανιές με Φυστικοβούτυρο + Φρούτο",k:358,p:10,l:13,c:53,t:"s"},
+ {n:"Κεφίρ πρωτεΐνης",f:"Μπουκάλι Κεφίρ πρωτεΐνης Όλυμπος",k:199,p:26,l:2,c:26,t:"s"},
+ {n:"Κοτόπουλο με πατάτες",f:"200γρ Κοτόπουλο, 250γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:810,p:73,l:22,c:76,t:"m"},
+ {n:"Κοτόπουλο με τηγανητές",f:"250γρ Μπούτι κοτόπουλο (ωμό), 250γρ Πατάτες τηγανητές (ωμό βάρος)",k:650,p:53,l:30,c:43,t:"m"},
+ {n:"Μοσχάρι κοκκινιστό",f:"200γρ Μοσχάρι, 200γρ Ρύζι (βρασμένο), Σαλάτα",k:786,p:59,l:31,c:67,t:"m"},
+ {n:"Φακές με φέτα",f:"2 κούπες Φακές, 60γρ Φέτα, Σαλάτα (χωρίς ψωμί)",k:781,p:48,l:28,c:89,t:"m"},
+ {n:"Μακαρόνια με κιμά",f:"100γρ Μακαρόνια (ωμά), 150γρ Κιμάς, 25γρ Τυρί, Σαλάτα",k:753,p:53,l:20,c:86,t:"m"},
+ {n:"Κοτόπουλο γύρος",f:"200γρ Μπούτι, 1 Πίτα, Τζατζίκι, Ντομάτα, Πατάτες",k:794,p:61,l:29,c:69,t:"m"},
+ {n:"Ψάρι ψητό",f:"300γρ Ψάρι, 250γρ Πατάτα, Σαλάτα",k:783,p:73,l:27,c:61,t:"m"},
+ {n:"Μπριζόλα με πατάτες",f:"250γρ Μπριζόλα, 250γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:1030,p:81,l:42,c:76,t:"m"},
+ {n:"Πένες με κοτόπουλο",f:"Πένες 100γρ (ωμές), Κοτόπουλο 150γρ, Σάλτσα ντομάτας, 25γρ Τυρί",k:795,p:68,l:18,c:86,t:"m"},
+ {n:"Μπιφτέκια με πατάτες",f:"200γρ Μπιφτέκια, 250γρ Πατάτα, Σαλάτα, 1 φ Ψωμί",k:754,p:53,l:25,c:76,t:"m"},
+ {n:"Παστίτσιο",f:"Μερίδα 350γρ + Σαλάτα",k:782,p:33,l:45,c:63,t:"m"},
+ {n:"Wrap με μπιφτέκι",f:"2 Τορτίγιες, 150γρ Μπιφτέκια, Τζατζίκι, Λαχανικά",k:661,p:46,l:21,c:67,t:"m"},
+ {n:"Αυγά με φέτα",f:"3 Αυγά, 50γρ Φέτα, Σαλάτα, 1 φ Ψωμί",k:554,p:34,l:36,c:25,t:"d"},
+ {n:"Βραστά αυγά με πατάτες και φέτα",f:"3 Αυγά βραστά, 50γρ Φέτα, 150γρ Πατάτες τηγανητές (ωμό βάρος)",k:560,p:29,l:37,c:29,t:"d"},
+ {n:"Τορτίγιες με κιμά και φέτα",f:"2 Τορτίγιες πρωτεΐνης Καραμολέγκος, 100γρ Κιμάς 5% (ωμός), 30γρ Φέτα, Κρεμμύδι, Ντομάτα",k:600,p:48,l:20,c:56,t:"d"},
+ {n:"Γιαούρτι με καρύδια",f:"250γρ Γιαούρτι 5%, Μέλι, 20γρ Καρύδια, Φρούτο",k:497,p:25,l:26,c:45,t:"d"},
+ {n:"Τοστ με γιαούρτι",f:"Τοστ Γαλοπούλα-Τυρί, 150γρ Γιαούρτι",k:471,p:39,l:18,c:36,t:"d"},
+ {n:"Σπανακόρυζο",f:"300γρ Σπανακόρυζο, 40γρ Φέτα, 150γρ Γιαούρτι",k:581,p:28,l:28,c:52,t:"d"},
+ {n:"Αραβική με κιμά",f:"1 Αραβική, 120γρ Κιμάς, 30γρ Τυρί",k:427,p:39,l:14,c:34,t:"d"},
+ {n:"Cottage",f:"200γρ Cottage με Μέλι, Καρύδια και Φρούτο",k:450,p:25,l:22,c:43,t:"d"},
+ {n:"Ελεύθερο",f:"Ό,τι θες — κράτα την πρωτεΐνη ψηλά",k:512,p:31,l:18,c:57,t:"d"}
 ];
 
 /* το παλιό πρόγραμμα ανά μέρα — μόνο για να διαβάζονται σωστά οι μέρες που γράφτηκαν πριν την αλλαγή */
@@ -726,7 +744,7 @@ var SHOP=[
 ];
 
 /* ---------- state ---------- */
-var db=null, today=iso(new Date()), state={log:[]}, hist=[], view="today", bought={}, price={};
+var db=null, today=iso(new Date()), state={log:[]}, hist=[], view="today", bought={}, price={}, sheetSlot="b";
 var custom=[];          /* δικά του φαγητά */
 var lastRest=null;      /* τελευταίες θερμίδες ηρεμίας που έβαλε — αλλάζουν λίγο από μέρα σε μέρα */
 var vday=today;         /* η μέρα που βλέπει/συμπληρώνει */
@@ -757,7 +775,9 @@ function allFoods(){ return custom.concat(FOODS); }
 function byName(n){ var l=allFoods(); for(var i=0;i<l.length;i++){ if(l[i].n===n)return l[i]; } return null; }
 function isMine(n){ for(var i=0;i<custom.length;i++){ if(custom[i].n===n)return true; } return false; }
 /* κρατάμε αντίγραφο των νούμερων, ώστε το ιστορικό να μην αλλάζει αν αλλάξει ή σβηστεί ένα φαγητό */
-function snap(f){ return {n:f.n,k:f.k,p:f.p,l:f.l,c:f.c}; }
+function snap(f,slot){ return {s:slot,n:f.n,k:f.k,p:f.p,l:f.l,c:f.c}; }
+/* σε ποιο γεύμα ανήκει μια εγγραφή — όσες γράφτηκαν χωρίς γεύμα πάνε εκεί που ταιριάζει το φαγητό */
+function slotOf(m){ if(m.s&&SLOTN[m.s])return m.s; var f=byName(m.n); return f&&f.t?f.t:"m"; }
 
 /* τι έφαγε μια μέρα· οι παλιές μέρες (πρωινό/σνακ/μεσημεριανό/βραδινό με τικ) μετατρέπονται εδώ */
 function logOf(r){
@@ -769,7 +789,7 @@ function logOf(r){
   ["b","s","m","d"].forEach(function(s){
     var v=meals[s]; if(!v)return;
     var f=byName(v===true?(sw[s]||oldDef(s,di)):v);
-    if(f)out.push(snap(f));
+    if(f)out.push(snap(f,s));
   });
   return out;
 }
@@ -845,13 +865,21 @@ function renderStrip(){
 function renderToday(){
   var d=vdate(), di=dow(d), weekend=di>=5, t=totals(state.log);
 
-  var html=state.log.length?state.log.map(function(m,i){
-    return '<div class="lg"><div class="lgb"><div class="lgn">'+esc(m.n)+'</div>'+
-      '<div class="lgnums"><b>'+m.k+'</b> kcal &nbsp;·&nbsp; Π '+m.p+' · Λ '+m.l+' · Υ '+m.c+'</div></div>'+
-      '<button class="lgx" data-rm="'+i+'" aria-label="Αφαίρεση: '+esc(m.n)+'">'+
-      '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';
-  }).join(""):'<div class="empty">Δεν έχεις περάσει τίποτα '+(vday===today?"σήμερα":"αυτή τη μέρα")+'.</div>';
-  html+='<button class="addbtn addfood" data-add="1">+ Πρόσθεσε φαγητό</button>';
+  var html=SLOTS.map(function(sl){
+    var items=[], st={k:0,p:0};
+    state.log.forEach(function(m,i){ if(slotOf(m)===sl){ items.push([m,i]); st.k+=m.k; st.p+=m.p; } });
+    return '<div class="slot">'+
+      '<button class="shead" data-add="'+sl+'"><b>'+SLOTN[sl]+'</b>'+
+        '<span>'+(items.length?fmt(st.k)+' kcal · Π '+st.p:'—')+'</span></button>'+
+      items.map(function(x){ var m=x[0];
+        return '<div class="sitem"><div class="lgb"><div class="lgn">'+esc(m.n)+'</div>'+
+          '<div class="lgnums"><b>'+m.k+'</b> kcal &nbsp;·&nbsp; Π '+m.p+' · Λ '+m.l+' · Υ '+m.c+'</div></div>'+
+          '<button class="lgx" data-rm="'+x[1]+'" aria-label="Αφαίρεση: '+esc(m.n)+'">'+
+          '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>';
+      }).join("")+
+      '<button class="sadd" data-add="'+sl+'">+ Πρόσθεσε '+(items.length?"κι άλλο":"φαγητό")+'</button>'+
+      '</div>';
+  }).join("");
   $("logList").innerHTML=html;
 
   var tr=TRAIN[di];
@@ -870,7 +898,7 @@ function renderToday(){
   $("sGoal").textContent=fmt(GOAL.k);
   $("sBar").style.width=Math.min(100,Math.round(t.k/GOAL.k*100))+"%";
   $("sLeft").textContent=t.k>GOAL.k?(fmt(t.k-GOAL.k)+" πάνω από τον στόχο"):t.k===GOAL.k?"στον στόχο":("απομένουν "+fmt(GOAL.k-t.k));
-  $("mP").textContent=t.p+" / "+GOAL.p+"γρ"; $("mF").textContent=t.l+"γρ"; $("mC").textContent=t.c+"γρ";
+  $("mP").textContent=t.p+"/"+GOAL.p+"γρ"; $("mF").textContent=t.l+"γρ"; $("mC").textContent=t.c+"γρ";
   $("hSub").textContent=DAYS[di]+" · "+d.toLocaleDateString("el-GR",{day:"numeric",month:"short"});
   if(view==="today")$("hTitle").textContent=dayTitle();
   renderStrip();
@@ -1083,12 +1111,13 @@ document.querySelectorAll(".tab").forEach(function(b){
 
 function addFood(f){
   if(!f)return;
-  state.log.push(snap(f));
+  state.log.push(snap(f,sheetSlot));
   upsertHist({log:state.log});
   closeSheet(); renderToday(); saveDay();
 }
 $("logList").addEventListener("click",function(e){
-  if(e.target.closest("[data-add]")){ openSheet(); return; }
+  var a=e.target.closest("[data-add]");
+  if(a){ openSheet(a.dataset.add); return; }
   var x=e.target.closest("[data-rm]"); if(!x)return;
   state.log.splice(+x.dataset.rm,1);
   upsertHist({log:state.log});
@@ -1133,10 +1162,11 @@ $("shopReset").addEventListener("click",function(){
 });
 
 /* ---------- λίστα φαγητών ---------- */
-function freq(){   /* πόσες φορές έχει περάσει κάθε φαγητό */
+function freq(sl){   /* πόσες φορές έχει περάσει κάθε φαγητό σε αυτό το γεύμα */
   var c={};
-  hist.forEach(function(r){ if(r.date===vday)return; logOf(r).forEach(function(m){ c[m.n]=(c[m.n]||0)+1; }); });
-  state.log.forEach(function(m){ c[m.n]=(c[m.n]||0)+1; });
+  function add(m){ if(slotOf(m)===sl)c[m.n]=(c[m.n]||0)+1; }
+  hist.forEach(function(r){ if(r.date===vday)return; logOf(r).forEach(add); });
+  state.log.forEach(add);
   return c;
 }
 function optHtml(m){
@@ -1155,20 +1185,26 @@ function renderSheetOpts(){
     var hits=list.filter(function(m){ return norm(m.n+" "+(m.f||"")).indexOf(q)>=0; });
     html=hits.length?hits.map(optHtml).join(""):'<div class="empty">Δεν βρέθηκε. Πρόσθεσέ το ως δικό σου φαγητό.</div>';
   }else{
-    var c=freq();
-    var top=list.filter(function(m){return c[m.n];}).sort(function(a,b){return c[b.n]-c[a.n];}).slice(0,5);
-    if(top.length)html+='<div class="sgroup">Συχνά</div>'+top.map(optHtml).join("")+'<div class="sgroup" style="margin-top:14px">Όλα</div>';
-    html+=list.slice().sort(function(a,b){return a.n.localeCompare(b.n,"el");}).map(optHtml).join("");
+    var c=freq(sheetSlot), shown={};
+    var top=list.filter(function(m){return c[m.n];}).sort(function(a,b){return c[b.n]-c[a.n];}).slice(0,4);
+    top.forEach(function(m){ shown[m.n]=1; });
+    var fit=list.filter(function(m){return !shown[m.n]&&(m.t||"m")===sheetSlot;});
+    fit.forEach(function(m){ shown[m.n]=1; });
+    var rest=list.filter(function(m){return !shown[m.n];}).sort(function(a,b){return a.n.localeCompare(b.n,"el");});
+    if(top.length)html+='<div class="sgroup">Συχνά '+SLOTA[sheetSlot]+'</div>'+top.map(optHtml).join("");
+    if(fit.length)html+='<div class="sgroup">Για '+SLOTN[sheetSlot].toLowerCase()+'</div>'+fit.map(optHtml).join("");
+    html+='<div class="sgroup">Όλα τα άλλα</div>'+rest.map(optHtml).join("");
   }
   $("sheetOpts").innerHTML=html;
 }
 function showSheetList(){
   $("sheetList").classList.remove("hide");
   $("sheetForm").classList.add("hide");
-  $("sheetTitle").textContent="Τι έφαγες;";
-  $("sheetSub").textContent=vday===today?"Πάτα ένα φαγητό για να μπει στη μέρα σου.":"Μπαίνει "+DAYS_ACC[vdi()]+".";
+  $("sheetTitle").textContent=SLOTN[sheetSlot];
+  $("sheetSub").textContent="Πάτα ένα φαγητό για να μπει "+SLOTA[sheetSlot]+"."+(vday===today?"":" ("+DAYS[vdi()]+")");
 }
-function openSheet(){
+function openSheet(slot){
+  sheetSlot=SLOTN[slot]?slot:"b";
   $("fSearch").value="";
   renderSheetOpts();
   showSheetList();
@@ -1195,7 +1231,7 @@ $("sheetAdd").addEventListener("click",function(){
   $("sheetList").classList.add("hide");
   $("sheetForm").classList.remove("hide");
   $("sheetTitle").textContent="Δικό μου φαγητό";
-  $("sheetSub").textContent="Θα μπει στη μέρα σου και θα μείνει στη λίστα για την επόμενη φορά.";
+  $("sheetSub").textContent="Θα μπει "+SLOTA[sheetSlot]+" και θα μείνει στη λίστα για την επόμενη φορά.";
   $("fName").focus();
 });
 $("fCancel").addEventListener("click",showSheetList);
@@ -1207,7 +1243,7 @@ $("fSave").addEventListener("click",function(){
   var p=num("fP"), l=num("fL"), c=num("fC"), k=num("fK");
   if(!k)k=Math.round(p*4+l*9+c*4);
   if(!k&&!p&&!l&&!c){ $("sheetSub").textContent="Βάλε θερμίδες ή μακροθρεπτικά."; $("fK").focus(); return; }
-  var f={n:n,f:$("fDesc").value.trim()||"Δικό σου φαγητό",k:k,p:p,l:l,c:c};
+  var f={n:n,f:$("fDesc").value.trim()||"Δικό σου φαγητό",k:k,p:p,l:l,c:c,t:sheetSlot};
   custom.push(f);
   saveCustom();
   addFood(f);
